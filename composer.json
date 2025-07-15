@@ -1,0 +1,24 @@
+{
+    "name": "madie/maxitsasn",
+    "autoload": {
+        "psr-4": {
+            "Madie\\Maxitsasn\\": "src/",
+            "App\\Core\\Abstract\\": "app/core/abstract/",
+            "App\\Core\\": "app/core/",
+            "App\\Controller\\": "src/controller/",
+            "App\\Entity\\": "src/entity/",
+            "App\\Repository\\": "src/repository/",
+            "App\\Service\\": "src/service/",
+             "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Die-tech-web",
+            "email": "dieniang32@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
