@@ -26,16 +26,15 @@ $user = $this->session->get('user');
         <p><span class="font-semibold">Numéro :</span> <?= htmlspecialchars($compte['numerotel']) ?></p>
     </div>
 
-    <!-- Transactions avec encadré + bouton -->
+    <!-- Transactions avec encadré -->
     <div class="mt-8 bg-white border border-gray-300 rounded-md shadow-md">
-        <!-- Titre cliquable -->
-        <button id="toggleTransactions"
-            class="w-full text-left text-lg font-semibold px-4 pt-4 text-[#8B4513] hover:underline focus:outline-none">
-            10 dernières transactions
-        </button>
+        <!-- Titre en texte simple -->
+        <div class="px-4 pt-4">
+            <h3 class="text-lg font-semibold text-[#8B4513]">10 dernières transactions</h3>
+        </div>
 
-        <!-- Bloc transactions caché par défaut -->
-        <div id="transactionsBloc" class="hidden divide-y divide-gray-300 text-sm text-gray-800">
+        <!-- Bloc transactions affiché directement -->
+        <div id="transactionsBloc" class="divide-y divide-gray-300 text-sm text-gray-800">
             <?php if (!empty($transactions)): ?>
                 <?php foreach (array_slice($transactions, 0, 10) as $t): ?>
                     <?php
@@ -61,7 +60,7 @@ $user = $this->session->get('user');
         </div>
     </div>
 
-    <!-- Bouton Voir plus séparé, toujours visible -->
+    <!-- Bouton Voir plus -->
     <div class="flex justify-center mt-4">
         <button id="voirPlusBtn" class="px-4 py-2 bg-[#8B4513] text-white rounded hover:bg-[#6f3610] transition">
             Voir plus
@@ -72,7 +71,7 @@ $user = $this->session->get('user');
 
 <!-- Scripts -->
 <script>
-    // Gestion du toggle du solde
+    // Toggle du solde
     const solde = <?= json_encode(number_format($compte['solde'], 0, ',', ' ')) ?>;
     const soldeEl = document.getElementById('solde');
     const toggleSoldeBtn = document.getElementById('toggleSolde');
@@ -84,27 +83,21 @@ $user = $this->session->get('user');
         toggleSoldeBtn.innerHTML = `<i class="fas fa-eye${soldeVisible ? '-slash' : ''}"></i>`;
     });
 
-    // Toggle 10 dernières transactions
-    const toggleTransactionsBtn = document.getElementById('toggleTransactions');
+    // Voir plus : charger toutes les transactions en AJAX
+    const voirPlusBtn = document.getElementById('voirPlusBtn');
     const transactionsBloc = document.getElementById('transactionsBloc');
 
-    toggleTransactionsBtn.addEventListener('click', () => {
-        transactionsBloc.classList.toggle('hidden');
-    });
-
-    // Chargement via AJAX de toutes les transactions au clic sur Voir plus
-    const voirPlusBtn = document.getElementById('voirPlusBtn');
     voirPlusBtn.addEventListener('click', () => {
         fetch('/transactions/all')
             .then(res => res.json())
             .then(data => {
-                if(data.error){
+                if (data.error) {
                     alert(data.error);
                     return;
                 }
                 const html = data.map(t => {
                     let typeColor = 'text-gray-700';
-                    switch(t.type.toLowerCase()){
+                    switch (t.type.toLowerCase()) {
                         case 'depot': typeColor = 'text-green-600'; break;
                         case 'retrait': typeColor = 'text-blue-600'; break;
                         case 'paiement': typeColor = 'text-orange-500'; break;
@@ -118,13 +111,11 @@ $user = $this->session->get('user');
                     `;
                 }).join('');
                 transactionsBloc.innerHTML = html;
-                // Affiche le bloc transactions s'il était caché
-                transactionsBloc.classList.remove('hidden');
 
-                // Désactive le bouton après chargement
+                // Désactiver le bouton
                 voirPlusBtn.disabled = true;
-                voirPlusBtn.textContent = 'Chargé';
-                voirPlusBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                // voirPlusBtn.textContent = 'Chargé';
+                // voirPlusBtn.classList.add('opacity-50', 'cursor-not-allowed');
             })
             .catch(() => alert('Erreur lors du chargement des transactions'));
     });
