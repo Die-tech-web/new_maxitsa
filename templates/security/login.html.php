@@ -1,7 +1,19 @@
-<?php $errors = [];?>
+<?php
+use App\Core\Session;
+
+$session = Session::getInstance();
+$errors = $session->get('errors') ?? [];
+$session->destroy(key: 'errors');
+$this->session->unset('errors');
+// $this->session->unset('old');
+?>
+
+<?php foreach ($errors as $error): ?>
+    <div style="color: red"><?= htmlspecialchars($error) ?></div>
+<?php endforeach; ?>
+
 
 <form class="space-y-6" action="/auth" method="post">
-    <!-- Erreur globale -->
     <?php if (!empty($errors['global'])): ?>
         <div class="mb-4 text-red-600 font-semibold text-center">
             <?= htmlspecialchars($errors['global']) ?>

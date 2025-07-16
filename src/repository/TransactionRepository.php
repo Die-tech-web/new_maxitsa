@@ -4,15 +4,12 @@ use App\Entity\Transactions;
 use App\Core\Database;
 use PDO;
 
-class TransactionRepository
+class TransactionRepository extends \App\Core\Abstract\AbstractRepository
 {
-
-    private Database $database;
 
     public function __construct()
     {
-
-        $this->database = new Database();
+        parent::__construct();
     }
 
     public function getLast10Transactions($userId): array
@@ -61,7 +58,7 @@ class TransactionRepository
     //pagination // TransactionRepository.php
 
 
-   
+
 
 
 

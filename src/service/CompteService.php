@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Core\App;
 use App\Repository\CompteRepository;
 class CompteService
 {
@@ -9,7 +10,7 @@ class CompteService
 
     public function __construct()
     {
-        $this->compteRepository = new CompteRepository();
+        $this->compteRepository = App::getDependency('compteRepository');
     }
 
     public function getSolde(int $userId): ?array

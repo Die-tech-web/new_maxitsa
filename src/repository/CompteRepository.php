@@ -3,14 +3,13 @@ namespace App\Repository;
 use App\Core\Database;
 use PDO;
 
-class CompteRepository
+class CompteRepository extends \App\Core\Abstract\AbstractRepository
 {
-
-    private Database $database;
 
     public function __construct()
     {
-        $this->database = new Database();
+        // $this->database = new Database();
+        parent::__construct();
     }
 
     public function getSoldeByUserId(int $userId): ?array

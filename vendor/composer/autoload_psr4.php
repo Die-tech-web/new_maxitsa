@@ -19,5 +19,4 @@ return array(
     'App\\Core\\Abstract\\' => array($baseDir . '/app/core/abstract'),
     'App\\Core\\' => array($baseDir . '/app/core'),
     'App\\Controller\\' => array($baseDir . '/src/controller'),
-    'App\\' => array($baseDir . '/app'),
 );

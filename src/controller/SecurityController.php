@@ -1,45 +1,60 @@
 <?php
 namespace App\Controller;
+
 use App\Core\Abstract\AbstractController;
-use PDO;
-use PDOException;
-use App\Service\UserService;
 use App\Core\App;
+use App\Service\UserService;
+use App\Core\Validator;
 
 class SecurityController extends AbstractController
 {
     private UserService $userService;
+    private Validator $validator;
+
     public function __construct()
-    {
-        // $this->baselayout = 'base.layout.html.php';
-        parent::__construct(); // ✅ initialise $this->session
-        $this->userService = new UserService();
-        // var_dump($this->userService);
-        // die;
-    }
-    public function login()
     {
 
         parent::__construct();
+        $this->userService = App::getDependency('userService');
+        $this->validator = App::getDependency('validator');
+    }
+
+    public function login()
+    {
         return $this->renderHtml('security/login');
     }
 
     public function auth()
     {
-        extract($_POST);
+        $loginData = [
+            'login' => $_POST['login'] ?? '',
+            'password' => $_POST['password'] ?? ''
+        ];
 
-        $user = $this->userService->getUserByLoginAndPassword($login, $password);
-        $this->session->set('user', $user);
-        if ($user) {
-            // var_dump(header('Location: /dashboard'));
-            // die;
-            header('Location: /dashboard');
+        if ($this->validator->validateLogin($loginData)) {
+            $user = $this->userService->getUserByLoginAndPassword($loginData['login'], $loginData['password']);
+
+            if ($user) {
+                $this->session->set('user', $user);
+                header('Location: /dashboard');
+                exit();
+            } else {
+
+                $this->validator->addError('login', "le login est incorrecte");
+                header('Location: /');
+                exit();
+            }
         } else {
-            header('Location: /login');
+            header('Location: /');
+            exit();
         }
     }
-
-
+    function logout()
+    {
+        $this->session->destroy('user');
+        header('Locaton: ' . $this->url . '/');
+        exit();
+    }
 
     public function store()
     {
@@ -65,5 +80,4 @@ class SecurityController extends AbstractController
     public function index()
     {
     }
-
 }

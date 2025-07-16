@@ -1,12 +1,13 @@
 <?php
 namespace App\Service;
 
+use App\Core\App;
 use App\Repository\UserRepository;
 
 class UserService{
     private UserRepository $userRepository;
     public function __construct(){
-        $this->userRepository = new UserRepository();
+        $this->userRepository = App::getDependency('userRepository');
 
 
     }

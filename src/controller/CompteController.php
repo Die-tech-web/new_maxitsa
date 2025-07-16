@@ -34,6 +34,17 @@ class CompteController extends AbstractController
 
 
     }
+
+public function test(){
+
+    $this->renderHtml("transaction/dashbord");
+}
+
+
+
+
+
+
     public function store()
     {
     }

@@ -7,17 +7,22 @@ use App\Core\App;
 
 $routes = [
     '/' => [
-        'controller' => App::getDependency('securiteController'),
+        'controller' => SecurityController::class,
         'methode' => 'login'
     ],
     '/auth' => [
         'controller' => SecurityController::class,
         'methode' => 'auth'
     ],
+     '/logout' => [
+        'controller' => SecurityController::class,
+        'methode' => 'login'
+    ],
     '/dashboard' => [
         'controller' => CompteController::class,
         'methode' => 'index',
     ],
+
     '/dashbord' => [
         'controller' => TransactionController::class,
         'methode' => 'index',
@@ -29,8 +34,17 @@ $routes = [
     '/transactions/paginate' => [
         'controller' => TransactionController::class,
         'methode' => 'all',
-    ]
+    ],
+    //   '/dashboards' => [
+    //     'controller' => App\Controller\DashboardController::class,
+    //     'methode' => 'index'
+    // ]
 
+
+    '/test' => [
+        'controller' => CompteController::class,
+        'methode' => 'test',
+    ],
 
 
 

@@ -2,6 +2,7 @@
 namespace App\Core\Abstract;
 
 use App\Core\Session;
+use App\Core\App;
 
 
 abstract class AbstractController
@@ -11,7 +12,7 @@ abstract class AbstractController
     protected Session $session;
     public function __construct()
     {
-        $this->session = Session::getInstance();
+        $this->session = App::getDependency('session');
     }
 
     public function renderHtml($view, $data = []): void

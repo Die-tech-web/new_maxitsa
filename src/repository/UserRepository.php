@@ -3,16 +3,15 @@ namespace App\Repository;
 use App\Core\Database;
 use PDO;
 use PDOException;
+use App\Core\Abstract\AbstractRepository;
 
 
-class UserRepository
+class UserRepository extends AbstractRepository
 {
-
-    private Database $database ;
 
     public function __construct()
     {
-        $this->database = new Database();
+        parent::__construct();
     }
 
     public function selectUserByloginAndPassword(string $login, string $password)
@@ -25,6 +24,6 @@ class UserRepository
         ]);
 
         return $result = $stmt->fetch(PDO::FETCH_ASSOC);
-       
+
     }
 }

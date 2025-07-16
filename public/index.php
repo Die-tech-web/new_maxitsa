@@ -5,7 +5,7 @@ use App\Core\App;
 use App\Service\TransactionService;
 require_once "../app/config/bootstrap.php";
 
-App::run();
+// App::run();
 
 
 Router::resolve($routes);
