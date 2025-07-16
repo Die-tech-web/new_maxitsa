@@ -23,9 +23,14 @@ $routes = [
         'methode' => 'index',
     ],
     '/transactions/all' => [
-    'controller' => TransactionController::class,
-    'methode' => 'allTransactions',
-],
+        'controller' => TransactionController::class,
+        'methode' => 'allTransactions',
+    ],
+    '/transactions/paginate' => [
+        'controller' => TransactionController::class,
+        'methode' => 'all',
+    ]
+
 
 
 

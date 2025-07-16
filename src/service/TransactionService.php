@@ -7,9 +7,6 @@ class TransactionService
 {
     private TransactionRepository $transactionsRepo;
 
-
-
-
     public function __construct()
     {
         $this->transactionsRepo = new TransactionRepository();

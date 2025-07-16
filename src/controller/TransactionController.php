@@ -51,6 +51,35 @@ class TransactionController extends AbstractController
         echo json_encode($data);
         exit;
     }
+    // TransactionController.php
+    public function all()
+    {
+        $user = $this->session->get('user');
+        $userId = $user['id'];
+
+        $page = $_GET['page'] ?? 1;
+        $page = max(1, (int) $page);
+        $limit = 10;
+
+        $repo = new TransactionRepository();
+        $paginator = new \App\Service\PaginationService();
+
+        $total = $repo->countTransactions($userId);
+        $pagination = $paginator->getPagination($total, $page, $limit);
+        $transactions = $repo->getPaginatedTransactions($userId, $pagination['limit'], $pagination['offset']);
+
+        // Format JSON
+        $result = array_map(fn($t) => [
+            'date' => $t->getDate()->format('d/m/Y'),
+            'montant' => number_format($t->getMontant(), 0, ',', ' '),
+            'type' => $t->getTypeTransaction()->value
+        ], $transactions);
+
+        echo json_encode([
+            'transactions' => $result,
+            'pagination' => $pagination
+        ]);
+    }
 
 
 
