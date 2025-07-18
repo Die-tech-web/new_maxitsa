@@ -1,4 +1,4 @@
---
+
 -- PostgreSQL database dump
 --
 
@@ -331,4 +331,3 @@ ALTER TABLE ONLY public.transaction
 
 --
 -- PostgreSQL database dump complete
---

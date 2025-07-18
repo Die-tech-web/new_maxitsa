@@ -112,7 +112,6 @@ if ($success): ?>
     </div>
 </div>
 
-<!-- JS Scripts -->
 <script>
     const solde = <?= json_encode(number_format($compte['solde'], 0, ',', ' ')) ?>;
     const soldeEl = document.getElementById('solde');
