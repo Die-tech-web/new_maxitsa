@@ -14,7 +14,7 @@ class TransactionService
         $this->transactionsRepo = App::getDependency('transactionRepository');
     }
 
-    public function getLast10Transactions(int $userId): array
+    public function getLast10Transactions(int $userId)  
     {
 
         return $this->transactionsRepo->getLast10Transactions($userId);

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Core\Abstract;
+use App\Core\App;
 use App\Core\Database;
 
 use PDO;
@@ -10,7 +11,7 @@ class AbstractRepository
 
     public function __construct()
     {
-        $this->database = new Database();
+        $this->database = App::getDependency('database');
     }
 
     // protected function getPdo(): ?PDO

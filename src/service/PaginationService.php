@@ -1,20 +1,20 @@
 <?php
-namespace App\Service;
+// namespace App\Service;
 
-class PaginationService
-{
-    public function getPagination(int $total, int $page, int $limit): array
-    {
-        $totalPages = ceil($total / $limit);
-        $offset = ($page - 1) * $limit;
+// class PaginationService
+// {
+//     public function getPagination(int $total, int $page, int $limit): array
+//     {
+//         $totalPages = ceil($total / $limit);
+//         $offset = ($page - 1) * $limit;
 
-        return [
-            'currentPage' => $page,
-            'totalPages' => ceil($total / $limit),
-            'limit' => $limit,
-            'offset' => $offset
-        ];
+//         return [
+//             'currentPage' => $page,
+//             'totalPages' => ceil($total / $limit),
+//             'limit' => $limit,
+//             'offset' => $offset
+//         ];
 
-    }
-}
+//     }
+// }
 

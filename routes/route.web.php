@@ -2,49 +2,52 @@
 use App\Controller\SecurityController;
 use App\Controller\CompteController;
 use App\Controller\TransactionController;
-use App\Router;
-use App\Core\App;
 
-$routes = [
+
+
+return $routes = [
+
     '/' => [
         'controller' => SecurityController::class,
-        'methode' => 'login'
+        'methode' => 'login',
     ],
     '/auth' => [
         'controller' => SecurityController::class,
-        'methode' => 'auth'
+        'methode' => 'auth',
     ],
-     '/logout' => [
+    '/logout' => [
         'controller' => SecurityController::class,
-        'methode' => 'login'
+        'methode' => 'logout',
+        'middleware' => 'auth',
+
     ],
     '/dashboard' => [
         'controller' => CompteController::class,
         'methode' => 'index',
+        'middleware' => 'auth',
     ],
-
+    '/compte/list' => [
+        'controller' => CompteController::class,
+        'methode' => 'listComptes',
+        'middleware' => 'auth',
+    ],
     '/dashbord' => [
         'controller' => TransactionController::class,
         'methode' => 'index',
+        'middleware' => 'auth',
     ],
     '/transactions/all' => [
         'controller' => TransactionController::class,
         'methode' => 'allTransactions',
+        'middleware' => 'auth',
     ],
-    '/transactions/paginate' => [
-        'controller' => TransactionController::class,
-        'methode' => 'all',
-    ],
-    //   '/dashboards' => [
-    //     'controller' => App\Controller\DashboardController::class,
-    //     'methode' => 'index'
-    // ]
-
-
-    '/test' => [
+    '/compte/ajouter-secondaire' => [
         'controller' => CompteController::class,
-        'methode' => 'test',
+        'methode' => 'ajouterCompteSecondaire',
+        'middleware' => 'auth',
+
     ],
+    
 
 
 

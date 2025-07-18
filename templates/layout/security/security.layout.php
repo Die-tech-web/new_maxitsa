@@ -17,10 +17,8 @@
 
 <body class="bg-orange-500 min-h-screen flex items-center justify-center">
     <div class="flex w-full max-w-6xl mx-auto">
-        <!-- Formulaire de connexion -->
         <div class="flex-1 flex items-center justify-center p-8">
             <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
-                <!-- Logo/Titre -->
                 <div class="text-center mb-8">
                     <div class="inline-block bg-gray-100 rounded-2xl px-6 py-3">
                         <h1 class="text-xl font-bold text-gray-800">MAX IT</h1>
@@ -28,7 +26,6 @@
                     </div>
                 </div>
 
-                <!-- Formulaire -->
                 <?php echo $content; ?>
 
             </div>

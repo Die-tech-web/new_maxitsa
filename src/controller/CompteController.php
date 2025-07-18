@@ -2,8 +2,10 @@
 namespace App\Controller;
 
 use App\Core\Abstract\AbstractController;
+use App\Core\App;
 use App\Core\Session;
 use App\Service\CompteService;
+use Dotenv\Validator;
 class CompteController extends AbstractController
 {
 
@@ -16,18 +18,15 @@ class CompteController extends AbstractController
 
     public function index(): void
     {
-        // var_dump("ok");
-        // die;
-        // extract($_POST);
 
         $user = $this->session->get('user');
         if (!$user) {
             header("Location: /");
             exit;
         }
-        $compteService = new CompteService();
+        $compteService = App::getDependency('compteService');
         $compte = $compteService->getSolde($user['id']);
-        
+
         $this->session->set('compte', $compte);
 
         header("Location: /dashbord");
@@ -35,10 +34,62 @@ class CompteController extends AbstractController
 
     }
 
-public function test(){
+    public function listeComptes()
+    {
+        // var_dump("ok");
+        // die;
+        $user = $this->session->get('user');
+        $compteService = App::getDependency('compteService');
+        $compte = $compteService->getSolde($user['id']);
+        $this->renderHtml('compte/list', ['compte' => $compte]);
+    }
 
-    $this->renderHtml("transaction/dashbord");
-}
+
+    public function ajouterCompteSecondaire()
+    {
+        $user = $this->session->get('user');
+        if (!$user) {
+            header('Location: /');
+            exit;
+        }
+
+        $validator = App::getDependency('validator');
+        $data = [
+            'userid' => $user['id'],
+            'numerotel' => trim($_POST['numerotel'] ?? ''),
+            'numero' => uniqid('CPT-'),
+            'datecreation' => date('Y-m-d H:i:s'),
+            'solde' => (float) ($_POST['solde'] ?? 0)
+
+        ];
+
+        if (!$validator->validateCompteSecondaire($data)) {
+            header('Location: /compte/list');
+            exit;
+        }
+
+        $compteService = App::getDependency('compteService');
+        if ($compteService->ajouterCompteSecondaire($data)) {
+            $validator->setSuccess("Compte secondaire ajouté avec succès.");
+        } else {
+            $validator->addError('compte', "Erreur lors de l'ajout du compte.");
+        }
+
+        header('Location: /compte/list');
+        exit;
+    }
+
+
+    public function listComptes()
+    {
+        $user = $this->session->get('user');
+        $compteService = App::getDependency('compteService');
+
+        $comptes = $compteService->getAllComptesByUserId($user['id']);
+
+        $this->renderHtml('compte/list', ['comptes' => $comptes]);
+    }
+
 
 
 
@@ -48,9 +99,7 @@ public function test(){
     public function store()
     {
     }
-    public function create()
-    {
-    }
+
     public function destroy()
     {
     }
@@ -66,6 +115,8 @@ public function test(){
     public function delete()
     {
     }
+    public function create()
+    {    }
 
 
 }

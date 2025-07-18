@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Core\Abstract\AbstractController;
+use App\Core\App;
 use App\Service\TransactionService;
 
 class TransactionController extends AbstractController
@@ -12,12 +13,18 @@ class TransactionController extends AbstractController
     {
         parent::__construct();
         $this->baselayout = 'base.layout.html.php';
-        $this->transactionService = new TransactionService();
+        $this->transactionService = App::getDependency('transactionService');
 
     }
     public function index()
     {
+       
         $user = $this->session->get('user');
+        if (!$user) {
+            header("Location: /");
+            exit;
+        }
+        
         $userId = $user['id'];
         $transactions = $this->transactionService->getLast10Transactions($userId);
         $this->session->set('transactions', $transactions);
@@ -61,14 +68,14 @@ class TransactionController extends AbstractController
         $page = max(1, (int) $page);
         $limit = 10;
 
-        $repo = new TransactionRepository();
-        $paginator = new \App\Service\PaginationService();
+        $repo = App::getDependency('transactionRepository');
+        $paginator = App::getDependency('paginationService');
 
         $total = $repo->countTransactions($userId);
         $pagination = $paginator->getPagination($total, $page, $limit);
         $transactions = $repo->getPaginatedTransactions($userId, $pagination['limit'], $pagination['offset']);
 
-        // Format JSON
+        
         $result = array_map(fn($t) => [
             'date' => $t->getDate()->format('d/m/Y'),
             'montant' => number_format($t->getMontant(), 0, ',', ' '),

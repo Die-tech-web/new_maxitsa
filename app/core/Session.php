@@ -4,7 +4,7 @@ namespace App\Core;
 
 class Session
 {
-    private static ?Session $session = null;
+    private static ?Session $instance = null;
 
     private function __construct()
     {
@@ -15,10 +15,12 @@ class Session
 
     public static function getInstance(): Session
     {
-        if (self::$session === null) {
-            self::$session = new Session();
+        if (self::$instance === null) {
+            self::$instance = new Session();
         }
-        return self::$session;
+        // var_dump(self::$instance);
+        // die;
+        return self::$instance;
     }
 
     public function set(string $key, $data): void
@@ -45,6 +47,10 @@ class Session
 
     public function destroy(string $key): void
     {
+        $_SESSION[$key] = null;
+
         $this->unset($key);
     }
+
+
 }

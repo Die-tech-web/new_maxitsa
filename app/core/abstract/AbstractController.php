@@ -12,7 +12,16 @@ abstract class AbstractController
     protected Session $session;
     public function __construct()
     {
-        $this->session = App::getDependency('session');
+
+        $this->session = Session::getInstance();
+
+        //mis a jour du solde  
+        $user = $this->session->get('user');
+        if ($user) {
+            $compteService = App::getDependency('compteService');
+            $compte = $compteService->getSolde($user['id']);
+            $this->session->set('compte', $compte);
+        }
     }
 
     public function renderHtml($view, $data = []): void

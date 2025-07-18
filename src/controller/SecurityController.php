@@ -15,8 +15,11 @@ class SecurityController extends AbstractController
     {
 
         parent::__construct();
+
         $this->userService = App::getDependency('userService');
+
         $this->validator = App::getDependency('validator');
+
     }
 
     public function login()
@@ -35,7 +38,7 @@ class SecurityController extends AbstractController
             $user = $this->userService->getUserByLoginAndPassword($loginData['login'], $loginData['password']);
 
             if ($user) {
-                $this->session->set('user', $user);
+                $test=$_SESSION['user'] = $user;
                 header('Location: /dashboard');
                 exit();
             } else {
@@ -49,12 +52,14 @@ class SecurityController extends AbstractController
             exit();
         }
     }
-    function logout()
+    public function logout()
     {
         $this->session->destroy('user');
-        header('Locaton: ' . $this->url . '/');
+        
+        header('Location: /');
         exit();
     }
+
 
     public function store()
     {

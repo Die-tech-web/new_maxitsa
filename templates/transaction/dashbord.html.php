@@ -1,88 +1,21 @@
 <?php
+
 $compte = $this->session->get('compte');
 $user = $this->session->get('user');
-?>
 
-<div class="sticky top-0 bg-white z-10  border-b border-gray-200 pb-6">
-    <div class="p-6 space-y-6">
-        <div class="bg-gradient-to-r from-white to-gray-50 p-6 rounded-xl shadow-lg border border-gray-200">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B]">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-gray-600 text-sm font-medium">Solde actuel</h2>
-                            <p id="solde" class="text-2xl font-bold text-gray-800">**** FCFA</p>
-                        </div>
-                        <button id="toggleSolde"
-                                class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-black border border-[#D7560B] rounded-md hover:bg-gray-50 transition-colors">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
+$session = \App\Core\Session::getInstance();
+$success = $session->get('success');
 
-                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B] cursor-pointer hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-gray-600 text-sm font-medium">Dépôt</h2>
-                            <p class="text-2xl font-bold text-gray-800">Ajouter</p>
-                        </div>
-                        <div class="w-8 h-8 flex items-center justify-center text-[#D7560B] border border-[#D7560B] rounded-md">
-                            <i class="fas fa-plus-circle"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B] cursor-pointer hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-gray-600 text-sm font-medium">Retrait</h2>
-                            <p class="text-2xl font-bold text-gray-800">Retirer</p>
-                        </div>
-                        <div class="w-8 h-8 flex items-center justify-center text-[#D7560B] border border-[#D7560B] rounded-md">
-                            <i class="fas fa-minus-circle"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B] cursor-pointer hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-gray-600 text-sm font-medium">Paiement</h2>
-                            <p class="text-2xl font-bold text-gray-800">Payer</p>
-                        </div>
-                        <div class="w-8 h-8 flex items-center justify-center text-[#D7560B] border border-[#D7560B] rounded-md">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B]">
-            <div class="flex items-center justify-between">
-                <div class="text-gray-700">
-                    <p class="flex items-center gap-2">
-                        <span class="text-xs bg-[#D7560B] text-white px-2 py-1 rounded-full flex flex-col items-center">
-                            <span>Compte Principal</span>
-                            <span class="font-mono"><?= htmlspecialchars($compte['numerotel']) ?></span>
-                        </span>
-                    </p>
-                </div>
-                <!-- <div class="flex items-center gap-2"> -->
-                    <button class="px-3 py-1 bg-[#D7560B] text-white text-xs rounded hover:bg-[#c65a0b] transition-colors border-l-4 border-white">
-                        <i class="fas fa-plus"></i> Ajouter Compte
-                    </button>
-                    <button class="px-3 py-1 bg-[#D7560B] text-white text-xs rounded hover:bg-[#c65a0b] transition-colors border-l-4 border-white">
-                        <i class="fas fa-exchange-alt"></i> Changer
-                    </button>
-                     <button class="px-3 py-1 bg-[#D7560B] text-white text-xs rounded hover:bg-[#c65a0b] transition-colors border-l-4 border-white">
-                        <i class="fas fa-eye"></i> Consulter compte
-                    </button>
-                <!-- </div> -->
-            </div>
-        </div>
+if ($success): ?>
+    <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+        <?= $success ?>
     </div>
-</div>
+    <?php $session->unset('success'); ?>
+<?php endif; ?>
+
+
+
+
 
 <div class="p-6 pt-0">
     <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -93,29 +26,33 @@ $user = $this->session->get('user');
                     <span id="transactionTitle">10 derniers transactions</span>
                 </h3>
                 <button id="voirPlusBtn"
-                        class="px-4 py-2 bg-white text-[#D7560B] rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2 shadow-md">
+                    class="px-4 py-2 bg-white text-[#D7560B] rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2 shadow-md">
                     <i class="fas fa-eye"></i>
                     <span class="font-medium">Voir plus</span>
                 </button>
             </div>
         </div>
 
-        <!-- Filtres de recherche -->
+
         <div id="searchFilters" class="hidden p-4 bg-gray-50 border-b">
             <div class="flex flex-wrap gap-4 items-center">
-                <button id="retourBtn" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2">
+                <button id="retourBtn"
+                    class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2">
                     <i class="fas fa-arrow-left"></i>
                     <span>Retour</span>
                 </button>
                 <div class="flex gap-2">
-                    <select id="typeFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D7560B]">
+                    <select id="typeFilter"
+                        class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D7560B]">
                         <option value="">Tous les types</option>
                         <option value="depot">Dépôt</option>
                         <option value="retrait">Retrait</option>
                         <option value="paiement">Paiement</option>
                     </select>
-                    <input type="date" id="dateFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D7560B]">
-                    <button id="resetFilters" class="px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                    <input type="date" id="dateFilter"
+                        class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D7560B]">
+                    <button id="resetFilters"
+                        class="px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -142,14 +79,15 @@ $user = $this->session->get('user');
                 <?php foreach (array_slice($transactions, 0, 10) as $t): ?>
                     <?php
                     $type = strtolower($t->getTypeTransaction()->value);
-                    $typeColor = match($type) {
+                    $typeColor = match ($type) {
                         'depot' => 'text-green-600 bg-green-50',
                         'retrait' => 'text-blue-600 bg-blue-50',
                         'paiement' => 'text-orange-500 bg-orange-50',
                         default => 'text-gray-700 bg-gray-50'
                     };
                     ?>
-                    <div class="grid grid-cols-3 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors items-center">
+                    <div
+                        class="grid grid-cols-3 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors items-center">
                         <span class="text-sm font-medium text-gray-600">
                             <?= $t->getDate()->format('d/m/Y') ?>
                         </span>
@@ -157,7 +95,8 @@ $user = $this->session->get('user');
                             <?= number_format($t->getMontant(), 0, ',', ' ') ?> FCFA
                         </span>
                         <span class="text-right">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase <?= $typeColor ?>">
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase <?= $typeColor ?>">
                                 <?= htmlspecialchars($t->getTypeTransaction()->value) ?>
                             </span>
                         </span>

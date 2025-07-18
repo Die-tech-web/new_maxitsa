@@ -43,6 +43,27 @@ class Validator
 
         return true;
     }
+    public function validateCompteSecondaire(array $data): bool
+    {
+        $numerotel = trim($data['numerotel'] ?? '');
+
+        if (empty($numerotel)) {
+            self::$errors['numerotel'] = 'Le numéro est obligatoire.';
+        } elseif (!preg_match('/^(77|78|76|70|75)[0-9]{7}$/', $numerotel)) {
+            self::$errors['numerotel'] = 'Numéro non valide (ex: 77XXXXXXX).';
+        }
+
+        if (!empty(self::$errors)) {
+            Session::getInstance()->set('errors', self::$errors);
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+
 
     public function addError(string $field, string $message): void
     {
