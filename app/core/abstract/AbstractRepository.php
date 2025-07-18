@@ -14,8 +14,5 @@ class AbstractRepository
         $this->database = App::getDependency('database');
     }
 
-    // protected function getPdo(): ?PDO
-    // {
-    //     return $this->database->getPdo();
-    // }
+   
 }

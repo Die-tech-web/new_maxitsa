@@ -5,7 +5,6 @@ $session = Session::getInstance();
 $errors = $session->get('errors') ?? [];
 $session->destroy(key: 'errors');
 $this->session->unset('errors');
-// $this->session->unset('old');
 ?>
 
 <?php foreach ($errors as $error): ?>

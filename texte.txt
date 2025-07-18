@@ -3,3 +3,161 @@ git commit -m "all Transactions"
 git push origin main
 
 
+gitignore 
+git rm -rf --cached vendor/
+git rm --cached .env
+git commit -m "creation du fichier .gitignore"
+
+
+migration-> php databasemigrate.php
+php databasemigrate.php --driver=pgsql
+
+
+sudo mysql_secure_installation
+
+
+composer run database:migrate
+
+
+
+DB_DATABASE=maxitsasn
+DB_USERNAME=postgres
+DB_PASSWORD=passer123
+URL=http://localhost:8000
+DSN=pgsql:host=localhost;dbname=maxitsasn;port=5432
+# DSN=mysql:host=localhost;dbname=maxitsasn;port=3306
+
+
+
+function runMigrations(PDO $pdo): void {
+    echo "🔄 Démarrage des migrations...\n";
+    
+    // 1. Création de la table users
+    echo "📝 Création de la table 'users'...\n";
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            nom VARCHAR(100) NOT NULL,
+            prenom VARCHAR(100) NOT NULL,
+            login VARCHAR(50) UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            numerocarteidentite VARCHAR(50) UNIQUE,
+            photorecto VARCHAR(255),
+            photoverso VARCHAR(255),
+            adresse VARCHAR(255),
+            typeuser VARCHAR(20) NOT NULL,
+            CONSTRAINT users_typeuser_check CHECK (typeuser IN ('client', 'service_commercial'))
+        );
+    ");
+    
+    // 2. Création de la table compte
+    echo "📝 Création de la table 'compte'...\n";
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS compte (
+            id SERIAL PRIMARY KEY,
+            numero VARCHAR(20) UNIQUE NOT NULL,
+            datecreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            solde NUMERIC(15,2) DEFAULT 0.00,
+            numerotel VARCHAR(20) NOT NULL,
+            typecompte VARCHAR(20) NOT NULL,
+            userid INTEGER NOT NULL,
+            CONSTRAINT compte_typecompte_check CHECK (typecompte IN ('principal', 'secondaire')),
+            CONSTRAINT compte_userid_fkey FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE
+        );
+    ");
+    
+    // 3. Création de la table transaction
+    echo "📝 Création de la table 'transaction'...\n";
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS transaction (
+            id SERIAL PRIMARY KEY,
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            typetransaction VARCHAR(20) NOT NULL,
+            montant NUMERIC(15,2) NOT NULL,
+            compteid INTEGER NOT NULL,
+            CONSTRAINT transaction_typetransaction_check CHECK (typetransaction IN ('depot', 'retrait', 'paiement')),
+            CONSTRAINT transaction_compteid_fkey FOREIGN KEY (compteid) REFERENCES compte(id) ON DELETE CASCADE
+        );
+    ");
+    
+    echo "✅ Toutes les tables ont été créées avec succès!\n";
+}
+
+function insertSampleData(PDO $pdo): void {
+    echo "🔄 Insertion des données d'exemple...\n";
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Insertion des utilisateurs
+        $pdo->exec("
+            INSERT INTO users (id, nom, prenom, login, password, numerocarteidentite, typeuser) 
+            VALUES 
+                (1, 'Niang', 'aidasa', 'aida', 'passer', '21388888880', 'client'),
+                (2, 'Niang', 'Madié', 'die', 'passer123', '21234567890', 'client')
+            ON CONFLICT (id) DO NOTHING;
+        ");
+        
+        // Mise à jour des séquences
+        $pdo->exec("SELECT setval('users_id_seq', 2, true);");
+        
+        // Insertion des comptes
+        $pdo->exec("
+            INSERT INTO compte (id, numero, datecreation, solde, numerotel, typecompte, userid) 
+            VALUES 
+                (2, '2', '2024-12-12 00:00:00', 465000.00, '778801947', 'principal', 2),
+                (36, 'CPT-687a26cdd829f', '2025-07-18 10:49:49', 30000.00, '775159909', 'secondaire', 2),
+                (37, 'CPT-687a2db6c7652', '2025-07-18 11:19:18', 5000.00, '773452800', 'secondaire', 2)
+            ON CONFLICT (id) DO NOTHING;
+        ");
+        
+        // Mise à jour des séquences
+        $pdo->exec("SELECT setval('compte_id_seq', 37, true);");
+        
+        // Insertion des transactions
+        $pdo->exec("
+            INSERT INTO transaction (id, date, typetransaction, montant, compteid) 
+            VALUES 
+                (1, '2025-07-12 00:00:00', 'retrait', 12000.00, 2),
+                (2, '2024-12-12 00:00:00', 'depot', 10000.00, 2),
+                (3, '2025-07-12 00:00:00', 'depot', 500.00, 2),
+                (4, '2025-07-12 00:00:00', 'paiement', 6000.00, 2),
+                (5, '2025-07-14 00:00:00', 'depot', 1000.00, 2),
+                (6, '2025-07-20 00:00:00', 'retrait', 7000.00, 2),
+                (7, '2025-06-12 00:00:00', 'depot', 7900.00, 2),
+                (8, '2025-07-12 00:00:00', 'depot', 22222.00, 2),
+                (9, '2025-07-01 00:00:00', 'paiement', 322.00, 2),
+                (10, '2025-07-12 00:00:00', 'depot', 7770.00, 2),
+                (11, '2025-07-12 00:00:00', 'retrait', 50888.00, 2),
+                (12, '2002-06-20 00:00:00', 'depot', 37890.00, 2),
+                (13, '2000-03-12 00:00:00', 'paiement', 12345.00, 2),
+                (15, '2024-09-12 00:00:00', 'paiement', 40000.00, 2)
+            ON CONFLICT (id) DO NOTHING;
+        ");
+        
+        // Mise à jour des séquences
+        $pdo->exec("SELECT setval('transaction_id_seq', 15, true);");
+        
+        $pdo->commit();
+        echo "✅ Données d'exemple insérées avec succès!\n";
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        throw new Exception("Erreur lors de l'insertion des données: " . $e->getMessage());
+    }
+}
+
+function showStats(PDO $pdo): void {
+    echo "\n📊 Statistiques de la base de données:\n";
+    echo "=====================================\n";
+    
+    $tables = ['users', 'compte', 'transaction'];
+    
+    foreach ($tables as $table) {
+        $stmt = $pdo->query("SELECT COUNT(*) as count FROM $table");
+        $count = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+        echo "• Table '$table': $count enregistrement(s)\n";
+    }
+    
+    echo "\n🔗 URL de l'application: " . (loadEnvConfig()['url'] ?? 'Non définie') . "\n";
+}

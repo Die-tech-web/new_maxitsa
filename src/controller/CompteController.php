@@ -13,6 +13,7 @@ class CompteController extends AbstractController
     {
         parent::__construct();
         $this->baselayout = 'base.layout.html.php';
+        $this->compteService = App::getDependency('compteService');
 
     }
 
@@ -36,8 +37,7 @@ class CompteController extends AbstractController
 
     public function listeComptes()
     {
-        // var_dump("ok");
-        // die;
+
         $user = $this->session->get('user');
         $compteService = App::getDependency('compteService');
         $compte = $compteService->getSolde($user['id']);
@@ -90,10 +90,22 @@ class CompteController extends AbstractController
         $this->renderHtml('compte/list', ['comptes' => $comptes]);
     }
 
+    public function changerComptePrincipal()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $user = $this->session->get('user');
+            $userId = $user['id'];
+            $compteSecondaireId = $_POST['compte_id'] ?? null;
 
+            if ($compteSecondaireId) {
+                $this->compteService->basculerEnprincipal($userId, (int) $compteSecondaireId);
+                $this->session->set('success', 'Le compte secondaire est maintenant principal.');
+            }
 
-
-
+            header('Location: /compte/list');
+            exit;
+        }
+    }
 
 
     public function store()
@@ -116,7 +128,8 @@ class CompteController extends AbstractController
     {
     }
     public function create()
-    {    }
+    {
+    }
 
 
 }
