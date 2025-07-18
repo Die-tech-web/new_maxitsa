@@ -48,31 +48,34 @@ if ($success): ?>
             <tbody class="bg-white divide-y divide-gray-200">
                 <?php
                 usort($comptes, function ($a, $b) {
-                    return $a['is_principal'] === $b['is_principal'] ? 0 : ($a['is_principal'] ? -1 : 1);
+                    $aPrincipal = ($a['typecompte'] === 'principal');
+                    $bPrincipal = ($b['typecompte'] === 'principal');
+                    return $aPrincipal === $bPrincipal ? 0 : ($aPrincipal ? -1 : 1);
                 });
                 ?>
 
                 <?php foreach ($comptes as $index => $c): ?>
-                    <tr class="hover:bg-gray-50 transition-colors duration-200 <?= $c['is_principal'] ? 'bg-orange-50 border-l-4 border-[#D7560B]' : '' ?>">
+                    <?php $isPrincipal = ($c['typecompte'] === 'principal'); ?>
+                    <tr class="hover:bg-gray-50 transition-colors duration-200 <?= $isPrincipal ? 'bg-orange-50 border-l-4 border-[#D7560B]' : '' ?>">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <?php if ($c['is_principal']): ?>
+                                <?php if ($isPrincipal): ?>
                                     <i class="fas fa-star text-[#D7560B] mr-2" title="Compte Principal"></i>
                                 <?php endif; ?>
-                                <span class="text-sm font-medium text-gray-900"><?= htmlspecialchars($c['id']) ?></span>
+                                <span class="text-sm font-medium text-gray-900"><?= htmlspecialchars($c['numero']) ?></span>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="text-sm text-gray-900"><?= htmlspecialchars($c['numerotel']) ?></span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?= $c['is_principal'] ? 'bg-[#D7560B] text-white' : 'bg-blue-100 text-blue-800' ?>">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?= $isPrincipal ? 'bg-[#D7560B] text-white' : 'bg-blue-100 text-blue-800' ?>">
                                 <?= ucfirst(htmlspecialchars($c['typecompte'])) ?>
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <span class="text-sm font-semibold text-gray-900"><?= number_format($c['solde'], 0, ',', ' ') ?> FCFA</span>
+                                <span class="text-sm font-semibold text-gray-900" id="solde-<?= $index ?>"><?= number_format($c['solde'], 0, ',', ' ') ?> FCFA</span>
                                 <button 
                                     onclick="toggleSoldeVisibility(<?= $index ?>)" 
                                     class="ml-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
@@ -83,15 +86,19 @@ if ($success): ?>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <?php if (!$c['is_principal']): ?>
-                                <button 
-                                    onclick="changerComptePrincipal(<?= $c['id'] ?>)" 
-                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-[#D7560B] hover:bg-[#B8490A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#D7560B] transition-all duration-200 transform hover:scale-105"
-                                    title="Définir comme compte principal"
-                                >
-                                    <i class="fas fa-exchange-alt mr-1"></i>
-                                    Changer
-                                </button>
+                            <?php if (!$isPrincipal): ?>
+                                <form method="POST" action="/compte/basculer-principal" style="display: inline;">
+                                    <input type="hidden" name="compte_id" value="<?= $c['id'] ?>">
+                                    <button 
+                                        type="submit"
+                                        onclick="return confirm('Êtes-vous sûr de vouloir définir ce compte comme compte principal ?')"
+                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-[#D7560B] hover:bg-[#B8490A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#D7560B] transition-all duration-200 transform hover:scale-105"
+                                        title="Définir comme compte principal"
+                                    >
+                                        <i class="fas fa-exchange-alt mr-1"></i>
+                                        Changer
+                                    </button>
+                                </form>
                             <?php else: ?>
                                 <span class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-[#D7560B] bg-orange-100 rounded-md">
                                     <i class="fas fa-crown mr-1"></i>
@@ -106,7 +113,6 @@ if ($success): ?>
         </table>
     </div>
 
-    <!-- Légende -->
     <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
         <div class="flex items-center space-x-4">
             <div class="flex items-center">
@@ -125,12 +131,12 @@ if ($success): ?>
 </div>
 
 <script>
+    <?php if ($compte): ?>
     const solde = <?= json_encode(number_format($compte['solde'], 0, ',', ' ')) ?>;
     const soldeEl = document.getElementById('solde');
     const toggleSoldeBtn = document.getElementById('toggleSolde');
     let soldeVisible = false;
 
-    // Fonction existante pour le toggle du solde principal
     if (toggleSoldeBtn) {
         toggleSoldeBtn.addEventListener('click', () => {
             soldeVisible = !soldeVisible;
@@ -138,75 +144,29 @@ if ($success): ?>
             toggleSoldeBtn.innerHTML = `<i class="fas fa-eye${soldeVisible ? '-slash' : ''}"></i>`;
         });
     }
+    <?php endif; ?>
 
-    // Nouvelle fonction pour masquer/afficher les soldes individuels
     function toggleSoldeVisibility(index) {
         const eyeIcon = document.getElementById(`eye-icon-${index}`);
-        const row = eyeIcon.closest('tr');
-        const soldeSpan = row.querySelector('td:nth-child(4) span');
+        const soldeSpan = document.getElementById(`solde-${index}`);
         
         if (eyeIcon.classList.contains('fa-eye')) {
             eyeIcon.classList.remove('fa-eye');
             eyeIcon.classList.add('fa-eye-slash');
+            soldeSpan.setAttribute('data-original-solde', soldeSpan.textContent);
             soldeSpan.textContent = '**** FCFA';
         } else {
             eyeIcon.classList.remove('fa-eye-slash');
             eyeIcon.classList.add('fa-eye');
-            // Récupérer le solde original depuis les données PHP
-            const originalSolde = row.getAttribute('data-solde');
+            const originalSolde = soldeSpan.getAttribute('data-original-solde');
             if (originalSolde) {
                 soldeSpan.textContent = originalSolde;
             }
         }
     }
-
-    // Fonction pour changer le compte principal
-    function changerComptePrincipal(compteId) {
-        if (confirm('Êtes-vous sûr de vouloir définir ce compte comme compte principal ?')) {
-            // Ici, vous pouvez ajouter votre logique pour changer le compte principal
-            // Par exemple, faire un appel AJAX vers votre contrôleur
-            
-            // Exemple d'appel AJAX (à adapter selon votre architecture)
-            fetch('/compte/changer-principal', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    compte_id: compteId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Recharger la page ou mettre à jour l'interface
-                    location.reload();
-                } else {
-                    alert('Erreur lors du changement de compte principal');
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Une erreur est survenue');
-            });
-        }
-    }
-
-    // Ajouter les attributs data-solde aux lignes pour la fonctionnalité de masquage
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('tbody tr');
-        rows.forEach((row, index) => {
-            const soldeSpan = row.querySelector('td:nth-child(4) span');
-            if (soldeSpan) {
-                row.setAttribute('data-solde', soldeSpan.textContent);
-            }
-        });
-    });
 </script>
 
 <style>
-    /* Styles supplémentaires pour améliorer l'apparence */
     .table-hover tr:hover {
         background-color: #f8f9fa;
     }
@@ -220,7 +180,6 @@ if ($success): ?>
         box-shadow: 0 4px 8px rgba(215, 86, 11, 0.3);
     }
     
-    /* Animation pour les boutons */
     @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.05); }

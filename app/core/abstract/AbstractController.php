@@ -15,7 +15,6 @@ abstract class AbstractController
 
         $this->session = Session::getInstance();
 
-        //mis a jour du solde  
         $user = $this->session->get('user');
         if ($user) {
             $compteService = App::getDependency('compteService');
@@ -48,7 +47,7 @@ abstract class AbstractController
 
     abstract public function destroy();
 
-    abstract public function show($id); // ✅ signature correcte
+    abstract public function show($id);
 
     abstract public function edit();
     abstract public function update();

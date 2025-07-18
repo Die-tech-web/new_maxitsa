@@ -21,10 +21,6 @@ class CompteRepository extends \App\Core\Abstract\AbstractRepository
         return $result;
     }
 
-
-
-
-
     public function ajouterSecondaire(array $data): bool
     {
         try {
@@ -79,6 +75,45 @@ class CompteRepository extends \App\Core\Abstract\AbstractRepository
     {
         $this->database->getPDO()->rollBack();
     }
+
+
+//    public function basculerEnprincipal(int $userId, int $compteSecondaireId): void
+// {
+//     $sql1 = "UPDATE compte SET typecompte = 'secondaire' WHERE userid = :userid AND typecompte = 'principal'";
+//     $stmt1 = $this->database->getPDO()->prepare($sql1);
+//     $stmt1->bindParam(':userid', $userId, \PDO::PARAM_INT);
+//     $stmt1->execute();
+
+//     $sql2 = "UPDATE compte SET typecompte = 'principal' WHERE id = :id AND userid = :userid";
+//     $stmt2 = $this->database->getPDO()->prepare($sql2);
+//     $stmt2->bindParam(':id', $compteSecondaireId, \PDO::PARAM_INT);
+//     $stmt2->bindParam(':userid', $userId, \PDO::PARAM_INT);
+//     $stmt2->execute();
+// }
+
+public function basculerEnprincipal(int $userId, int $compteSecondaireId): bool {
+    try {
+        $this->beginTransaction();
+        
+        $sql1 = "UPDATE compte SET typecompte = 'secondaire' WHERE userid = :userid AND typecompte = 'principal'";
+        $stmt1 = $this->database->getPDO()->prepare($sql1);
+        $stmt1->bindParam(':userid', $userId, \PDO::PARAM_INT);
+        $stmt1->execute();
+
+        $sql2 = "UPDATE compte SET typecompte = 'principal' WHERE id = :id AND userid = :userid";
+        $stmt2 = $this->database->getPDO()->prepare($sql2);
+        $stmt2->bindParam(':id', $compteSecondaireId, \PDO::PARAM_INT);
+        $stmt2->bindParam(':userid', $userId, \PDO::PARAM_INT);
+        $stmt2->execute();
+        
+        $this->commit();
+        return true;
+    } catch (\Exception $e) {
+        $this->rollBack();
+        return false;
+    }
+}
+
 
 
     public function getCompteInfos(int $userId): ?array

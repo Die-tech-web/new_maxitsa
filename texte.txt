@@ -3,3 +3,14 @@ git commit -m "all Transactions"
 git push origin main
 
 
+gitignore 
+git rm -rf --cached vendor/
+git rm --cached .env
+git commit -m "creation du fichier .gitignore"
+
+
+migration-> php databasemigrate.php
+php databasemigrate.php --driver=pgsql
+
+
+sudo mysql_secure_installation

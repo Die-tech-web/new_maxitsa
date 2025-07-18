@@ -47,7 +47,13 @@ return $routes = [
         'middleware' => 'auth',
 
     ],
-    
+
+    '/compte/basculer-principal' => [
+        'controller' => CompteController::class,
+        'methode' => 'changerComptePrincipal', 
+        'middleware' => 'auth',
+    ],
+
 
 
 
