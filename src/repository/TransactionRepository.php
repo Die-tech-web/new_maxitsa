@@ -55,10 +55,31 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
         return $transactions;
     }
 
+    //pagination // TransactionRepository.php
 
+    public function getPaginatedTransactions(int $userId, int $page, int $limit): array
+    {
+        $offset = ($page - 1) * $limit;
+        $sql = "SELECT t.* 
+        FROM transaction t
+        INNER JOIN compte c ON t.compteid = c.id
+        WHERE c.userid = :userid AND c.typecompte = 'principal'
+        ORDER BY t.date DESC
+        LIMIT :limit OFFSET :offset";
 
+        $statement = $this->database->getPdo()->prepare($sql);
+        $statement->bindParam(':userid', $userId, PDO::PARAM_INT);
+        $statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $statement->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $statement->execute();
 
+        $transactions = [];
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $transactions[] = Transactions::toObject($row);
+        }
 
+        return $transactions;
+    }
 
 
 

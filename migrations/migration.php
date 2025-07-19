@@ -7,25 +7,20 @@ function prompt(string $message): string {
     return trim(fgets(STDIN));
 }
 
-function writeEnvIfNotExists(array $config): void {
+function writeEnv(array $config): void {
     $envPath = __DIR__ . '/../.env';
-    if (!file_exists($envPath)) {
-        $env = <<<ENV
+    $env = <<<ENV
 DB_DRIVER={$config['driver']}
 DB_HOST={$config['host']}
 DB_PORT={$config['port']}
 DB_NAME={$config['dbname']}
-DB_USER={$config['user']}
+DB_USERNAME={$config['user']}
 DB_PASSWORD={$config['pass']}
-ROUTE_WEB=http://localhost:8000/
-
-dns = "{$config['driver']}:host={$config['host']}; dbname={$config['dbname']};port={$config['port']}"
+DSN="{$config['driver']}:host={$config['host']};dbname={$config['dbname']};port={$config['port']}"
 ENV;
-        file_put_contents($envPath, $env);
-        echo ".env généré avec succès à la racine du projet.\n";
-    } else {
-        echo "Le fichier .env existe déjà, aucune modification.\n";
-    }
+
+    file_put_contents($envPath, $env);
+    echo ".env généré/mis à jour avec succès.\n";
 }
 
 $driver = strtolower(prompt("Quel SGBD utiliser ? (mysql / pgsql) : "));
@@ -44,34 +39,28 @@ try {
         $check = $pdo->query("SELECT 1 FROM pg_database WHERE datname = '$dbName'")->fetch();
         if (!$check) {
             $pdo->exec("CREATE DATABASE \"$dbName\"");
-            echo "Base PostgreSQL `$dbName` créée.\nRelancez la migration pour créer les tables.\n";
-                writeEnvIfNotExists([
-                        'driver' => $driver,
-                        'host' => $host,
-                        'port' => $port,
-                        'user' => $user,
-                        'pass' => $pass,
-                        'dbname' => $dbName
-                    ]);            
-            exit;
+            echo "Base PostgreSQL `$dbName` créée.\n";
         } else {
-            echo "ℹ Base PostgreSQL `$dbName` déjà existante.\n";
+            echo "Base PostgreSQL `$dbName` déjà existante.\n";
         }
+    } elseif ($driver === 'mysql') {
+        $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        echo "Base MySQL `$dbName` créée ou existante.\n";
+    } else {
+        die("SGBD non supporté\n");
     }
 
-    $dsn = "$driver:host=$host;port=$port;dbname=$dbName";
-    $pdo = new PDO($dsn, $user, $pass);
+    // Connexion à la base
+    $dsnDb = "$driver:host=$host;port=$port;dbname=$dbName";
+    $pdo = new PDO($dsnDb, $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     if ($driver === 'pgsql') {
         $tables = [
-
-          
             "CREATE SEQUENCE IF NOT EXISTS users_id_seq START WITH 1 INCREMENT BY 1;",
             "CREATE SEQUENCE IF NOT EXISTS compte_id_seq START WITH 1 INCREMENT BY 1;",
             "CREATE SEQUENCE IF NOT EXISTS transaction_id_seq START WITH 1 INCREMENT BY 1;",
 
-       
             "CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY DEFAULT nextval('users_id_seq'),
                 nom VARCHAR(100) NOT NULL,
@@ -88,7 +77,6 @@ try {
                 CONSTRAINT users_typeuser_check CHECK (typeuser IN ('client', 'service_commercial'))
             );",
 
-      
             "CREATE TABLE IF NOT EXISTS compte (
                 id INTEGER PRIMARY KEY DEFAULT nextval('compte_id_seq'),
                 numero VARCHAR(20) NOT NULL UNIQUE,
@@ -101,7 +89,6 @@ try {
                 CONSTRAINT compte_userid_fkey FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE
             );",
 
-            // TRANSACTION
             "CREATE TABLE IF NOT EXISTS transaction (
                 id INTEGER PRIMARY KEY DEFAULT nextval('transaction_id_seq'),
                 date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -113,25 +100,57 @@ try {
             );"
         ];
     } else {
-        echo "Ce script est uniquement adapté pour PostgreSQL.\n";
-        exit;
+        $tables = [
+            "CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nom VARCHAR(100) NOT NULL,
+                prenom VARCHAR(100) NOT NULL,
+                login VARCHAR(50) UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                numerocarteidentite VARCHAR(50) UNIQUE,
+                photorecto VARCHAR(255),
+                photoverso VARCHAR(255),
+                adresse VARCHAR(255),
+                typeuser ENUM('client', 'service_commercial') NOT NULL
+            );",
+
+            "CREATE TABLE IF NOT EXISTS compte (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                numero VARCHAR(20) NOT NULL UNIQUE,
+                datecreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                solde DECIMAL(15,2) DEFAULT 0.00,
+                numerotel VARCHAR(20) NOT NULL,
+                typecompte ENUM('principal', 'secondaire') NOT NULL,
+                userid INT NOT NULL,
+                FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE
+            );",
+
+            "CREATE TABLE IF NOT EXISTS transaction (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                typetransaction ENUM('depot', 'retrait', 'paiement') NOT NULL,
+                montant DECIMAL(15,2) NOT NULL,
+                compteid INT NOT NULL,
+                FOREIGN KEY (compteid) REFERENCES compte(id) ON DELETE CASCADE
+            );"
+        ];
     }
 
     foreach ($tables as $sql) {
         $pdo->exec($sql);
     }
 
-    echo "Toutes les tables ont été créées avec succès dans `$dbName`.\n";
+    echo "Tables créées avec succès dans `$dbName`.\n";
 
-    writeEnvIfNotExists([
+    writeEnv([
         'driver' => $driver,
-        'host' => $host,
-        'port' => $port,
-        'user' => $user,
-        'pass' => $pass,
+        'host'   => $host,
+        'port'   => $port,
+        'user'   => $user,
+        'pass'   => $pass,
         'dbname' => $dbName
     ]);
 
 } catch (Exception $e) {
-    echo "Erreur : " . $e->getMessage() . "\n";
+    echo "❌ Erreur : " . $e->getMessage() . "\n";
 }

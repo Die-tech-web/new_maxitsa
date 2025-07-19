@@ -24,13 +24,13 @@ class CompteService
         $comptePrincipal = $this->compteRepository->getSoldeByUserId($data['userid']);
 
         if (!$comptePrincipal || $comptePrincipal['solde'] < $soldeSecondaire) {
-            return false; 
+            return false; // Pas assez d'argent
         }
 
         $this->compteRepository->beginTransaction();
 
         try {
-           
+            // Ajouter le compte secondaire
             $ok = $this->compteRepository->ajouterSecondaire($data);
 
             if (!$ok) {
@@ -58,9 +58,16 @@ class CompteService
 // {
 //     $this->compteRepository->basculerEnprincipal($userId, $compteSecondaireId);
 // }
-public function basculerEnprincipal(int $userId, int $compteSecondaireId): bool {
-    return $this->compteRepository->basculerEnprincipal($userId, $compteSecondaireId);
-}
+
+
+    //     public function basculerEnprincipal(int $userId, int $compteSecondaireId): void
+// {
+//     $this->compteRepository->basculerEnprincipal($userId, $compteSecondaireId);
+// }
+    public function basculerEnprincipal(int $userId, int $compteSecondaireId): bool
+    {
+        return $this->compteRepository->basculerEnprincipal($userId, $compteSecondaireId);
+    }
 
 
 }

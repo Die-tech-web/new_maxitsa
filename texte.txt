@@ -12,6 +12,15 @@ git commit -m "creation du fichier .gitignore"
 migration-> php databasemigrate.php
 php databasemigrate.php --driver=pgsql
 
+DB_DATABASE=maxitsasn
+DB_USERNAME=postgres
+DB_PASSWORD=passer123
+URL=http://localhost:8000
+DSN=pgsql:host=localhost;dbname=maxitsasn;port=5432
+# DSN=mysql:host=localhost;dbname=maxitsasn;port=3306
+
+pour mysql mysql_native_password mdp passer
+
 
 sudo mysql_secure_installation
 <<<<<<< HEAD
