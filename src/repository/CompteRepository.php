@@ -12,15 +12,26 @@ class CompteRepository extends \App\Core\Abstract\AbstractRepository
         parent::__construct();
     }
 
- public function getSoldeByUserId(int $userId): ?array
-{
-    $sql = "SELECT * FROM compte WHERE userid = :userId AND typecompte = 'principal' LIMIT 1";
-    $stmt = $this->database->getPDO()->prepare($sql);
-    $stmt->execute(['userId' => $userId]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    public function getSoldeByUserId(int $userId): ?array
+    {
+        $sql = "SELECT * FROM compte WHERE userid = :userId AND typecompte = 'principal' LIMIT 1";
+        $stmt = $this->database->getPDO()->prepare($sql);
+        $stmt->execute(['userId' => $userId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $result !== false ? $result : null;
-}
+        return $result !== false ? $result : null;
+    }
+
+
+    public function getComptePrincipal(int $userId): ?array
+    {
+        $sql = "SELECT * FROM compte WHERE userid = :userId AND typecompte = 'principal' LIMIT 1";
+        $stmt = $this->database->getPDO()->prepare($sql);
+        $stmt->execute(['userId' => $userId]);
+        $compte = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $compte !== false ? $compte : null;
+    }
 
     public function ajouterSecondaire(array $data): bool
     {
@@ -77,43 +88,52 @@ class CompteRepository extends \App\Core\Abstract\AbstractRepository
         $this->database->getPDO()->rollBack();
     }
 
+     public function getCompteByUserId(int $userId): ?array
+    {
+        $sql = "SELECT * FROM compte WHERE userid = :userId LIMIT 1";
+        $stmt = $this->database->getPdo()->prepare($sql);
+        $stmt->execute(['userId' => $userId]);
 
-//    public function basculerEnprincipal(int $userId, int $compteSecondaireId): void
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    //    public function basculerEnprincipal(int $userId, int $compteSecondaireId): void
 // {
 //     $sql1 = "UPDATE compte SET typecompte = 'secondaire' WHERE userid = :userid AND typecompte = 'principal'";
 //     $stmt1 = $this->database->getPDO()->prepare($sql1);
 //     $stmt1->bindParam(':userid', $userId, \PDO::PARAM_INT);
 //     $stmt1->execute();
 
-//     $sql2 = "UPDATE compte SET typecompte = 'principal' WHERE id = :id AND userid = :userid";
+    //     $sql2 = "UPDATE compte SET typecompte = 'principal' WHERE id = :id AND userid = :userid";
 //     $stmt2 = $this->database->getPDO()->prepare($sql2);
 //     $stmt2->bindParam(':id', $compteSecondaireId, \PDO::PARAM_INT);
 //     $stmt2->bindParam(':userid', $userId, \PDO::PARAM_INT);
 //     $stmt2->execute();
 // }
 
-public function basculerEnprincipal(int $userId, int $compteSecondaireId): bool {
-    try {
-        $this->beginTransaction();
-        
-        $sql1 = "UPDATE compte SET typecompte = 'secondaire' WHERE userid = :userid AND typecompte = 'principal'";
-        $stmt1 = $this->database->getPDO()->prepare($sql1);
-        $stmt1->bindParam(':userid', $userId, \PDO::PARAM_INT);
-        $stmt1->execute();
+    public function basculerEnprincipal(int $userId, int $compteSecondaireId): bool
+    {
+        try {
+            $this->beginTransaction();
 
-        $sql2 = "UPDATE compte SET typecompte = 'principal' WHERE id = :id AND userid = :userid";
-        $stmt2 = $this->database->getPDO()->prepare($sql2);
-        $stmt2->bindParam(':id', $compteSecondaireId, \PDO::PARAM_INT);
-        $stmt2->bindParam(':userid', $userId, \PDO::PARAM_INT);
-        $stmt2->execute();
-        
-        $this->commit();
-        return true;
-    } catch (\Exception $e) {
-        $this->rollBack();
-        return false;
+            $sql1 = "UPDATE compte SET typecompte = 'secondaire' WHERE userid = :userid AND typecompte = 'principal'";
+            $stmt1 = $this->database->getPDO()->prepare($sql1);
+            $stmt1->bindParam(':userid', $userId, \PDO::PARAM_INT);
+            $stmt1->execute();
+
+            $sql2 = "UPDATE compte SET typecompte = 'principal' WHERE id = :id AND userid = :userid";
+            $stmt2 = $this->database->getPDO()->prepare($sql2);
+            $stmt2->bindParam(':id', $compteSecondaireId, \PDO::PARAM_INT);
+            $stmt2->bindParam(':userid', $userId, \PDO::PARAM_INT);
+            $stmt2->execute();
+
+            $this->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->rollBack();
+            return false;
+        }
     }
-}
 
 
 

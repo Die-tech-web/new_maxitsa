@@ -14,6 +14,8 @@ class TransactionController extends AbstractController
         parent::__construct();
         $this->baselayout = 'base.layout.html.php';
         $this->transactionService = App::getDependency('transactionService');
+        $this->compteRepository = App::getDependency('compteRepository');
+
     }
 
     public function index(): void
@@ -94,8 +96,7 @@ class TransactionController extends AbstractController
     {
         $this->renderHtml("transaction/depot");
     }
-
-    public function store(): void
+   public function store(): void
     {
         $user = $this->session->get('user');
         if (!$user) {
@@ -114,6 +115,39 @@ class TransactionController extends AbstractController
 
         if (!$typetransaction) {
             $errors[] = 'Veuillez choisir un type de transaction.';
+        }
+
+        // Récupérer les infos du compte principal de l'utilisateur
+        $compteRepo = App::getDependency('compteRepository');
+        $comptePrincipal = $compteRepo->getComptePrincipal($user['id']);
+
+        if (!$comptePrincipal) {
+            $errors[] = "Aucun compte principal trouvé pour l'utilisateur.";
+        }
+
+        $isPrincipal = $comptePrincipal['typecompte'] === 'principal';
+        $soldeComptePrincipal = $comptePrincipal['solde'];
+
+        $frais = 0;
+        if ($isPrincipal && $typetransaction === 'depot') {
+            $frais = $montant * 0.0085;
+            $total = $montant + $frais;
+
+            if ($soldeComptePrincipal < $total) {
+                $errors[] = "Solde insuffisant pour couvrir le dépôt et les frais (égal à $total FCFA).";
+            }
+        }
+        // var_dump($montant);
+        // die;
+        if ($typetransaction === 'depot_principal_to_principal') {
+       
+            $frais = min($montant * 0.08, 5000);
+            $total = $montant + $frais;
+            
+
+            if ($soldeComptePrincipal < $total) {
+                $errors[] = "Solde insuffisant pour le transfert entre comptes principaux avec frais.";
+            }
         }
 
         if ($errors) {

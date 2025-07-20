@@ -55,13 +55,16 @@ return $routes = [
     ],
     '/depot' => [
         'controller' => TransactionController::class,
-        'methode' => 'create'
+        'methode' => 'create',
+        'middleware' => 'auth',
+
 
     ],
 
     '/transaction/store' => [
         'controller' => TransactionController::class,
-        'methode' => 'store'
+        'methode' => 'store',
+        'middleware' => 'auth',
     ],
 
 
