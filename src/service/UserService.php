@@ -15,4 +15,16 @@ class UserService{
     {
         return $this->userRepository->selectUserByloginAndPassword($login, $password);
     }
+    
+//     public function getUserByLoginAndPassword($login, $password)
+// {
+//     $user = $this->userRepository->findBy(['login' => $login]);
+
+//     if ($user && password_verify($password, $user['password'])) {
+//         return $user;
+//     }
+
+//     return null;
+// }
+
 }
