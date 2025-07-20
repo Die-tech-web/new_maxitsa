@@ -18,13 +18,13 @@ class TransactionController extends AbstractController
     }
     public function index()
     {
-       
+
         $user = $this->session->get('user');
         if (!$user) {
             header("Location: /");
             exit;
         }
-        
+
         $userId = $user['id'];
         $transactions = $this->transactionService->getLast10Transactions($userId);
         $this->session->set('transactions', $transactions);
@@ -58,7 +58,7 @@ class TransactionController extends AbstractController
         echo json_encode($data);
         exit;
     }
-  
+
     public function all()
     {
         $user = $this->session->get('user');
@@ -75,7 +75,7 @@ class TransactionController extends AbstractController
         $pagination = $paginator->getPagination($total, $page, $limit);
         $transactions = $repo->getPaginatedTransactions($userId, $pagination['limit'], $pagination['offset']);
 
-        
+
         $result = array_map(fn($t) => [
             'date' => $t->getDate()->format('d/m/Y'),
             'montant' => number_format($t->getMontant(), 0, ',', ' '),
@@ -89,14 +89,54 @@ class TransactionController extends AbstractController
     }
 
 
-
+    public function create()
+    {
+        $this->renderHtml("transaction/depot");
+    }
 
     public function store()
     {
+        $user = $this->session->get('user');
+        if (!$user) {
+            header('Location: /');
+            exit;
+        }
+
+        $montant = $_POST['montant'] ?? null;
+        $mode = $_POST['mode_paiement'] ?? null;
+
+        $errors = [];
+
+        if (!$montant || $montant < 100) {
+            $errors[] = 'Le montant doit être supérieur ou égal à 100 FCFA.';
+        }
+
+        if (!$mode) {
+            $errors[] = 'Veuillez choisir un mode de paiement.';
+        }
+
+        if ($errors) {
+            $this->session->set('errors', $errors);
+            header('Location: /depot'); 
+            exit;
+        }
+
+        $success = $this->transactionService->createDepot($user['id'], (float) $montant, $mode);
+
+        if ($success) {
+            $this->session->set('success', 'Dépôt effectué avec succès.');
+        } else {
+            $this->session->set('errors', ['Une erreur est survenue lors du dépôt.']);
+        }
+
+        header('Location: /depot'); 
+        exit;
     }
-    public function create()
-    {
-    }
+
+
+
+
+
     public function destroy()
     {
     }

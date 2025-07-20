@@ -101,7 +101,6 @@ class CompteController extends AbstractController
             $this->compteService->basculerEnprincipal($userId, (int) $compteSecondaireId);
             $this->session->set('success', 'Le compte secondaire est maintenant principal.');
         }
-        // ✅ Redirection corrigée
         header('Location: /compte/list');
         exit;
     }

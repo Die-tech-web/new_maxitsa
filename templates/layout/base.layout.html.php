@@ -1,9 +1,10 @@
 <?php
 $session = App\Core\Session::getInstance();
 $errors = $session->get('errors');
-$success = $session->get('success');?>
+$success = $session->get('success'); ?>
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -93,19 +94,22 @@ $success = $session->get('success');?>
                             </div>
                         </div>
 
-                        <div
-                            class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B] cursor-pointer hover:bg-gray-50 transition-colors">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h2 class="text-gray-600 text-sm font-medium">Dépôt</h2>
-                                    <p class="text-2xl font-bold text-gray-800">Ajouter</p>
-                                </div>
-                                <div
-                                    class="w-8 h-8 flex items-center justify-center text-[#D7560B] border border-[#D7560B] rounded-md">
-                                    <i class="fas fa-plus-circle"></i>
+                        <!-- Remplacez cette section dans votre base.layout.php -->
+                        <a href="/depot">
+                            <div
+                                class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B] cursor-pointer hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h2 class="text-gray-600 text-sm font-medium">Dépôt</h2>
+                                        <p class="text-2xl font-bold text-gray-800">Ajouter</p>
+                                    </div>
+                                    <div
+                                        class="w-8 h-8 flex items-center justify-center text-[#D7560B] border border-[#D7560B] rounded-md">
+                                        <i class="fas fa-plus-circle"></i>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
 
                         <div
                             class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B] cursor-pointer hover:bg-gray-50 transition-colors">
@@ -148,7 +152,7 @@ $success = $session->get('success');?>
                                 </span>
                             </p>
                         </div>
-                       
+
                         <button
                             class="px-3 py-1 bg-[#D7560B] text-white text-xs rounded hover:bg-[#c65a0b] transition-colors border-l-4 border-white">
                             <i class="fas fa-plus"></i> Ajouter Compte
@@ -161,7 +165,7 @@ $success = $session->get('success');?>
                                 <input type="text" name="numerotel" placeholder="Numéro de téléphone"
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D7560B]"
                                     required />
-                                     <h2 class="text-lg font-bold mb-4 text-[#D7560B]">Ajouter solde</h2>
+                                <h2 class="text-lg font-bold mb-4 text-[#D7560B]">Ajouter solde</h2>
                                 <input type="text" name="solde" placeholder="ajouter solde"
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#D7560B]"
                                     required />
@@ -194,7 +198,7 @@ $success = $session->get('success');?>
                             class="px-3 py-1 bg-[#D7560B] text-white text-xs rounded hover:bg-[#c65a0b] transition-colors border-l-4 border-white">
                             <i class="fas fa-eye"></i> Consulter compte
                         </button>
-                       
+
                     </div>
                 </div>
             </div>

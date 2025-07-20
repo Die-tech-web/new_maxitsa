@@ -50,9 +50,21 @@ return $routes = [
 
     '/compte/basculer-principal' => [
         'controller' => CompteController::class,
-        'methode' => 'changerComptePrincipal', 
+        'methode' => 'changerComptePrincipal',
         'middleware' => 'auth',
     ],
+    '/depot' => [
+        'controller' => TransactionController::class,
+        'methode' => 'create'
+
+    ],
+
+    '/transaction/store' => [
+        'controller' => TransactionController::class,
+        'methode' => 'store'
+    ],
+
+
 
 
 

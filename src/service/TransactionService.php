@@ -14,7 +14,7 @@ class TransactionService
         $this->transactionsRepo = App::getDependency('transactionRepository');
     }
 
-    public function getLast10Transactions(int $userId)  
+    public function getLast10Transactions(int $userId)
     {
 
         return $this->transactionsRepo->getLast10Transactions($userId);
@@ -25,6 +25,12 @@ class TransactionService
     {
         return $this->transactionsRepo->getAllTransactions($userId);
     }
+
+    public function createDepot(int $userId, float $montant, string $mode): bool
+    {
+        return $this->transactionsRepo->createDepot($userId, $montant, $mode);
+    }
+
 
 
 }

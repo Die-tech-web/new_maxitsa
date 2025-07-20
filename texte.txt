@@ -19,7 +19,12 @@ URL=http://localhost:8000
 DSN=pgsql:host=localhost;dbname=maxitsasn;port=5432
 # DSN=mysql:host=localhost;dbname=maxitsasn;port=3306
 
-pour mysql mysql_native_password mdp passer
+
+Afficher les dépôts récents ?
+
+Gérer les comptes secondaires ?
+
+Ajouter un solde mis à jour automatiquement après dépôt ?
 
 
 sudo mysql_secure_installation
