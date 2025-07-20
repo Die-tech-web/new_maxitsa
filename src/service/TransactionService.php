@@ -26,10 +26,11 @@ class TransactionService
         return $this->transactionsRepo->getAllTransactions($userId);
     }
 
-    public function createDepot(int $userId, float $montant, string $mode): bool
-    {
-        return $this->transactionsRepo->createDepot($userId, $montant, $mode);
-    }
+   public function createDepot(int $userId, float $montant, string $type): bool
+{
+    return $this->transactionsRepo->createDepot($userId, $montant, $type);
+}
+
 
 
 

@@ -80,33 +80,30 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
 
         return $transactions;
     }
+public function createDepot(int $userId, float $montant, string $type): bool
+{
+    $sqlCompte = "SELECT id FROM compte WHERE userid = :userid AND typecompte = 'principal' LIMIT 1";
+    $stmt = $this->database->getPdo()->prepare($sqlCompte);
+    $stmt->bindParam(':userid', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    $compte = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    public function createDepot(int $userId, float $montant, string $mode): bool
-    {
-        // Récupérer le compte principal de l'utilisateur
-        $sqlCompte = "SELECT id FROM compte WHERE userid = :userid AND typecompte = 'principal' LIMIT 1";
-        $stmt = $this->database->getPdo()->prepare($sqlCompte);
-        $stmt->bindParam(':userid', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-        $compte = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$compte) {
-            return false;
-        }
-
-        $compteId = $compte['id'];
-
-        // Insérer la transaction
-        $sql = "INSERT INTO transaction (compteid, montant, type_transaction, date, mode_paiement)
-            VALUES (:compteid, :montant, 'depot', NOW(), :mode)";
-
-        $stmt = $this->database->getPdo()->prepare($sql);
-        $stmt->bindParam(':compteid', $compteId, PDO::PARAM_INT);
-        $stmt->bindParam(':montant', $montant);
-        $stmt->bindParam(':mode', $mode);
-
-        return $stmt->execute();
+    if (!$compte) {
+        return false;
     }
+
+    $compteId = $compte['id'];
+
+    $sql = "INSERT INTO transaction (compteid, montant, typetransaction, date)
+            VALUES (:compteid, :montant, :typetransaction, NOW())";
+
+    $stmt = $this->database->getPdo()->prepare($sql);
+    $stmt->bindParam(':compteid', $compteId, PDO::PARAM_INT);
+    $stmt->bindParam(':montant', $montant);
+    $stmt->bindParam(':typetransaction', $type);
+
+    return $stmt->execute();
+}
 
 
 

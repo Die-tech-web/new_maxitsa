@@ -14,11 +14,10 @@ class TransactionController extends AbstractController
         parent::__construct();
         $this->baselayout = 'base.layout.html.php';
         $this->transactionService = App::getDependency('transactionService');
-
     }
-    public function index()
-    {
 
+    public function index(): void
+    {
         $user = $this->session->get('user');
         if (!$user) {
             header("Location: /");
@@ -28,13 +27,13 @@ class TransactionController extends AbstractController
         $userId = $user['id'];
         $transactions = $this->transactionService->getLast10Transactions($userId);
         $this->session->set('transactions', $transactions);
+
         $this->renderHtml("transaction/dashbord", [
             'transactions' => $transactions
         ]);
-
     }
 
-    public function allTransactions()
+    public function allTransactions(): void
     {
         $user = $this->session->get('user');
         if (!$user) {
@@ -59,13 +58,17 @@ class TransactionController extends AbstractController
         exit;
     }
 
-    public function all()
+    public function all(): void
     {
         $user = $this->session->get('user');
-        $userId = $user['id'];
+        if (!$user) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Non autorisé']);
+            exit;
+        }
 
-        $page = $_GET['page'] ?? 1;
-        $page = max(1, (int) $page);
+        $userId = $user['id'];
+        $page = max(1, (int) ($_GET['page'] ?? 1));
         $limit = 10;
 
         $repo = App::getDependency('transactionRepository');
@@ -74,7 +77,6 @@ class TransactionController extends AbstractController
         $total = $repo->countTransactions($userId);
         $pagination = $paginator->getPagination($total, $page, $limit);
         $transactions = $repo->getPaginatedTransactions($userId, $pagination['limit'], $pagination['offset']);
-
 
         $result = array_map(fn($t) => [
             'date' => $t->getDate()->format('d/m/Y'),
@@ -88,13 +90,12 @@ class TransactionController extends AbstractController
         ]);
     }
 
-
-    public function create()
+    public function create(): void
     {
         $this->renderHtml("transaction/depot");
     }
 
-    public function store()
+    public function store(): void
     {
         $user = $this->session->get('user');
         if (!$user) {
@@ -103,7 +104,7 @@ class TransactionController extends AbstractController
         }
 
         $montant = $_POST['montant'] ?? null;
-        $mode = $_POST['mode_paiement'] ?? null;
+        $typetransaction = $_POST['typetransaction'] ?? null;
 
         $errors = [];
 
@@ -111,17 +112,17 @@ class TransactionController extends AbstractController
             $errors[] = 'Le montant doit être supérieur ou égal à 100 FCFA.';
         }
 
-        if (!$mode) {
-            $errors[] = 'Veuillez choisir un mode de paiement.';
+        if (!$typetransaction) {
+            $errors[] = 'Veuillez choisir un type de transaction.';
         }
 
         if ($errors) {
             $this->session->set('errors', $errors);
-            header('Location: /depot'); 
+            header('Location: /depot');
             exit;
         }
 
-        $success = $this->transactionService->createDepot($user['id'], (float) $montant, $mode);
+        $success = $this->transactionService->createDepot($user['id'], (float) $montant, $typetransaction);
 
         if ($success) {
             $this->session->set('success', 'Dépôt effectué avec succès.');
@@ -129,29 +130,14 @@ class TransactionController extends AbstractController
             $this->session->set('errors', ['Une erreur est survenue lors du dépôt.']);
         }
 
-        header('Location: /depot'); 
+        header('Location: /depot');
         exit;
     }
 
-
-
-
-
-    public function destroy()
-    {
-    }
-    public function show($id)
-    {
-    }
-    public function edit()
-    {
-    }
-    public function update()
-    {
-    }
-    public function delete()
-    {
-    }
-
-
+    // Méthodes placeholders si tu veux les compléter plus tard
+    public function destroy(): void {}
+    public function show($id): void {}
+    public function edit(): void {}
+    public function update(): void {}
+    public function delete(): void {}
 }
