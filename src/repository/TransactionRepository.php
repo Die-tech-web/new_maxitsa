@@ -77,7 +77,6 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
         return $transactions;
     }
 
-    // Méthode pour compter les transactions (nécessaire pour la pagination)
     public function countTransactions(int $userId): int
     {
         $sql = "SELECT COUNT(*) as total 
@@ -136,7 +135,7 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
         try {
             $pdo->beginTransaction();
 
-            // Insérer la transaction
+         
             $stmt = $pdo->prepare("INSERT INTO transaction (compteid, montant, typetransaction, date) VALUES (:compteid, :montant, :type, :date)");
             $stmt->execute([
                 ':compteid' => $transaction['compte_id'],
@@ -145,7 +144,7 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
                 ':date' => $transaction['date'],
             ]);
 
-            // Mettre à jour le solde du compte
+         
             $stmt = $pdo->prepare("UPDATE compte SET solde = :solde WHERE id = :id");
             $stmt->execute([
                 ':solde' => $compte['solde'],

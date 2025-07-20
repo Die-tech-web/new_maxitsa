@@ -1,0 +1,28 @@
+
+
+services:
+  router: App\Core\Router
+  database: App\Core\Database
+  validator: App\Core\Validator
+  session: App\Core\Session  
+
+
+
+  # Controllers
+  compteController: App\Controller\CompteController
+  securityController: App\Controller\SecurityController
+  transactionController: App\Controller\TransactionController
+
+  # Services
+  userService: App\Service\UserService
+  compteService: App\Service\CompteService       
+  transactionService: App\Service\TransactionService
+  paginationService: App\Service\PaginationService
+
+  # Repositories
+  userRepository: App\Repository\UserRepository
+  compteRepository: App\Repository\CompteRepository
+  transactionRepository: App\Repository\TransactionRepository
+
+  # Middlewares
+  authMiddleware: App\Core\Middlewares\Auth

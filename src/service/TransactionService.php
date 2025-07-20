@@ -27,19 +27,16 @@ class TransactionService
         return $this->transactionsRepo->getAllTransactions($userId);
     }
 
-    // Méthode corrigée avec la bonne signature
     public function createDepot(int $userId, float $montant, string $type): bool
     {
         try {
-            // Récupérer le compte principal
             $compte = $this->compteRepository->getComptePrincipal($userId);
-            
+
             if (!$compte) {
                 Session::getInstance()->set('errors', ['Aucun compte principal trouvé.']);
                 return false;
             }
 
-            // Calculer les frais selon le type de transaction
             $frais = 0;
             if ($type === 'depot') {
                 $frais = $montant * 0.0085;
@@ -49,7 +46,6 @@ class TransactionService
 
             $total = $montant + $frais;
 
-            // Vérifier le solde
             if ($compte['solde'] < $total) {
                 Session::getInstance()->set('errors', ['Solde insuffisant pour couvrir la transaction et les frais.']);
                 return false;
@@ -68,7 +64,7 @@ class TransactionService
 
             // Enregistrer la transaction et mettre à jour le solde
             return $this->transactionsRepo->storeDepot($transaction, $compte);
-            
+
         } catch (\Exception $e) {
             error_log("Erreur dans createDepot: " . $e->getMessage());
             Session::getInstance()->set('errors', ['Une erreur est survenue lors du traitement.']);

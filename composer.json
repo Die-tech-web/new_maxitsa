@@ -20,11 +20,11 @@
     }
   ],
   "require": {
-    "vlucas/phpdotenv": "^5.6"
+    "vlucas/phpdotenv": "^5.6",
+    "symfony/yaml": "^7.3"
   },
- "scripts": {
+  "scripts": {
     "database:migrate": "php migrations/migration.php",
-    "database:seeder":"php seeders/seeder.php"
+    "database:seeder": "php seeders/seeder.php"
   }
-
 }

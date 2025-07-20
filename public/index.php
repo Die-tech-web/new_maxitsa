@@ -6,6 +6,7 @@ use App\Service\TransactionService;
 require_once "../app/config/bootstrap.php";
 
 
+App::run();
 Router::resolve($routes);
 
 

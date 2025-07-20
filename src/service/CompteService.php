@@ -24,13 +24,13 @@ class CompteService
         $comptePrincipal = $this->compteRepository->getSoldeByUserId($data['userid']);
 
         if (!$comptePrincipal || $comptePrincipal['solde'] < $soldeSecondaire) {
-            return false; // Pas assez d'argent
+            return false; 
         }
 
         $this->compteRepository->beginTransaction();
 
         try {
-            // Ajouter le compte secondaire
+           
             $ok = $this->compteRepository->ajouterSecondaire($data);
 
             if (!$ok) {

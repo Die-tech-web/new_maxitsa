@@ -1,43 +1,50 @@
 <?php
+
 namespace App\Core;
+
+use Symfony\Component\Yaml\Yaml;
 
 class App
 {
-    private static $dependencies = [
+    private static array $dependencies = [];
 
-        "router" => \App\Core\Router::class,
-        "database" => \App\Core\Database::class,
-        "validator" => \App\Core\Validator::class,
-        "session" => \App\Core\Session::class,
-        "compteController" => \App\Controller\CompteController::class,
-        "securityController" => \App\Controller\SecurityController::class,
-        "transactionController" => \App\Controller\TransactionController::class,
-        "userService" => \App\Service\UserService::class,
-        "userRepository" => \App\Repository\UserRepository::class,
-        "compteRepository" => \App\Repository\CompteRepository::class,
-        "compteService" => \App\Service\CompteService::class,
-        "transactionService" => \App\Service\TransactionService::class,
-        "transactionRepository" => \App\Repository\TransactionRepository::class,
-        "paginationService" => \App\Service\PaginationService::class,
-        "authMiddleware" => \App\Core\Middlewares\Auth::class,
-
-
-
-    ];
-
-    public static function getDependency($key)
+    public static function run(): void
     {
+        self::loadServices();
+    }
 
-        if (array_key_exists($key, self::$dependencies)) {
-
-            $class = self::$dependencies[$key];
-            if (class_exists($class) && method_exists($class, 'getInstance')) {
-
-                // dd($class::getInstance());
-                return $class::getInstance();
-            }
-            return new $class();
+    private static function loadServices(): void
+    {
+        $path = dirname(__DIR__, 1) . '/config/services.yml';
+        if (!file_exists($path)) {
+            throw new \Exception("Le fichier services.yml est introuvable.");
         }
 
+        $parsed = Yaml::parseFile($path);
+
+        if (!isset($parsed['services']) || !is_array($parsed['services'])) {
+            throw new \Exception("Clé 'services' manquante ou invalide dans services.yml");
+        }
+
+        self::$dependencies = $parsed['services'];
+    }
+
+    public static function getDependency(string $key): mixed
+    {
+        if (!isset(self::$dependencies[$key])) {
+            throw new \Exception("Dépendance '{$key}' non définie dans services.yml");
+        }
+
+        $class = self::$dependencies[$key];
+
+        if (!class_exists($class)) {
+            throw new \Exception("Classe {$class} introuvable pour la dépendance '{$key}'");
+        }
+
+        if (method_exists($class, 'getInstance')) {
+            return $class::getInstance();
+        }
+
+        return new $class();
     }
 }

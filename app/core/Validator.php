@@ -62,9 +62,6 @@ class Validator
     }
 
 
-
-
-
     public function addError(string $field, string $message): void
     {
         self::$errors[$field] = $message;

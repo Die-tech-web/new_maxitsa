@@ -100,7 +100,7 @@ $success = $session->get('success'); ?>
                                 class="bg-white p-4 rounded-lg shadow-md border-l-4 border-[#D7560B] cursor-pointer hover:bg-gray-50 transition-colors">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <h2 class="text-gray-600 text-sm font-medium">Dépôt</h2>
+                                        <h2 class="text-gray-600 text-sm font-medium">transaction</h2>
                                         <p class="text-2xl font-bold text-gray-800">Ajouter</p>
                                     </div>
                                     <div
