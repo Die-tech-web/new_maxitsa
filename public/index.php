@@ -1,4 +1,5 @@
 <?php
+ob_start(); 
 
 use App\Core\Router;
 use App\Core\App;
