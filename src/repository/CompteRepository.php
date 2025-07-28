@@ -72,6 +72,16 @@ class CompteRepository extends \App\Core\Abstract\AbstractRepository
             ':id' => $compteId
         ]);
     }
+    public function findById(int $id): ?array
+    {
+        $sql = "SELECT * FROM compte WHERE id = :id LIMIT 1";
+        $stmt = $this->database->getPDO()->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
+
 
     public function beginTransaction(): void
     {
@@ -88,7 +98,7 @@ class CompteRepository extends \App\Core\Abstract\AbstractRepository
         $this->database->getPDO()->rollBack();
     }
 
-     public function getCompteByUserId(int $userId): ?array
+    public function getCompteByUserId(int $userId): ?array
     {
         $sql = "SELECT * FROM compte WHERE userid = :userId LIMIT 1";
         $stmt = $this->database->getPdo()->prepare($sql);
@@ -96,6 +106,53 @@ class CompteRepository extends \App\Core\Abstract\AbstractRepository
 
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
+
+    public function createTransaction(int $compteId, string $type, float $montant, string $description): array
+    {
+        try {
+            // Commencer une transaction
+            $this->beginTransaction();
+
+            // 1. Insérer la transaction
+            $sql = "INSERT INTO transaction (compteid, typeuser, montant, description, date_transaction)
+                VALUES (:compteid, :typeuser, :montant, :description, NOW())";
+            $stmt = $this->database->getPDO()->prepare($sql);
+            $stmt->execute([
+                ':compteid' => $compteId,
+                ':typeuser' => $type,
+                ':montant' => $montant,
+                ':description' => $description
+            ]);
+
+           
+            $sqlSolde = "UPDATE compte SET solde = solde - :montant WHERE id = :id";
+            $stmtSolde = $this->database->getPDO()->prepare($sqlSolde);
+            $stmtSolde->execute([
+                ':montant' => $montant,
+                ':id' => $compteId
+            ]);
+
+            // 3. Récupérer le nouveau solde
+            $sqlCheck = "SELECT solde FROM compte WHERE id = :id";
+            $stmtCheck = $this->database->getPDO()->prepare($sqlCheck);
+            $stmtCheck->execute([':id' => $compteId]);
+            $newSolde = $stmtCheck->fetch(PDO::FETCH_ASSOC)['solde'] ?? 0;
+
+            $this->commit();
+
+            return [
+                'success' => true,
+                'nouveau_solde' => $newSolde
+            ];
+        } catch (\Exception $e) {
+            $this->rollBack();
+            return [
+                'success' => false,
+                'message' => "Erreur transaction : " . $e->getMessage()
+            ];
+        }
+    }
+
 
     //    public function basculerEnprincipal(int $userId, int $compteSecondaireId): void
 // {

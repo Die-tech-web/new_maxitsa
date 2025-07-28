@@ -1,6 +1,4 @@
-git add .
-git commit -m "all Transactions"
-git push origin main
+origin main
 
 
 gitignore 
@@ -19,7 +17,9 @@ URL=http://localhost:8000
 DSN=pgsql:host=localhost;dbname=maxitsasn;port=5432
 # DSN=mysql:host=localhost;dbname=maxitsasn;port=3306
 
-
+git add .
+git commit -m "all Transactions"
+git push 
 Afficher les dépôts récents ?
 
 Gérer les comptes secondaires ?

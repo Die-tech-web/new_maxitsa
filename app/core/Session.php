@@ -52,5 +52,13 @@ class Session
         $this->unset($key);
     }
 
+    public function remove(string $key): void
+    {
+        if (isset($_SESSION[$key])) {
+            unset($_SESSION[$key]);
+        }
+    }
+
+
 
 }

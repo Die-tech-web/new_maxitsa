@@ -87,7 +87,7 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
         $statement = $this->database->getPdo()->prepare($sql);
         $statement->bindParam(':userid', $userId, PDO::PARAM_INT);
         $statement->execute();
-        
+
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         return (int) $result['total'];
     }
@@ -135,7 +135,7 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
         try {
             $pdo->beginTransaction();
 
-         
+
             $stmt = $pdo->prepare("INSERT INTO transaction (compteid, montant, typetransaction, date) VALUES (:compteid, :montant, :type, :date)");
             $stmt->execute([
                 ':compteid' => $transaction['compte_id'],
@@ -144,7 +144,7 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
                 ':date' => $transaction['date'],
             ]);
 
-         
+
             $stmt = $pdo->prepare("UPDATE compte SET solde = :solde WHERE id = :id");
             $stmt->execute([
                 ':solde' => $compte['solde'],
@@ -166,7 +166,7 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
         try {
             $sql = "INSERT INTO transaction (compteid, montant, typetransaction, date) VALUES (:compteid, :montant, :type, :date)";
             $stmt = $this->database->getPdo()->prepare($sql);
-            
+
             return $stmt->execute([
                 ':compteid' => $compteId,
                 ':montant' => $montant,
@@ -177,5 +177,23 @@ class TransactionRepository extends \App\Core\Abstract\AbstractRepository
             error_log("Erreur dans saveTransaction: " . $e->getMessage());
             return false;
         }
+    }
+
+    public function annulerDepot(int $transactionId): bool
+    {
+        $sql = "DELETE FROM transaction WHERE id = :id AND type = 'depot'";
+        $stmt = $this->database->getPdo()->prepare($sql);
+        return $stmt->execute(['id' => $transactionId]);
+    }
+
+    public function findById(int $transactionId): ?array
+    {
+        $sql = "SELECT * FROM transaction WHERE id = :id";
+        $stmt = $this->database->getPdo()->prepare($sql);
+        $stmt->bindParam(':id', $transactionId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
     }
 }

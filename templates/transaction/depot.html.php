@@ -2,6 +2,10 @@
 $session = App\Core\Session::getInstance();
 $errors = $session->get('errors');
 $success = $session->get('success');
+$comptes = $session->get('comptes_user') ?? [];
+
+// Debug pour vérifier si les comptes sont récupérés
+// var_dump($comptes); // Décommentez temporairement pour débugger
 ?>
 
 <!-- Overlay du Modal - Fixed pour empêcher le scroll -->
@@ -54,9 +58,34 @@ $success = $session->get('success');
 
             <!-- Formulaire -->
             <form method="POST" action="/transaction/store" class="space-y-6">
-                <!-- <input type="hidden" name="type" value="depot"> -->
 
-                <
+                <!-- Sélection du compte source -->
+                <div>
+                    <label for="compte_source" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Compte source (optionnel)
+                    </label>
+                    <select name="compte_source" id="compte_source"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#D7560B] focus:ring-0 text-sm">
+                        <option value="">-- Utiliser le compte principal par défaut --</option>
+                        <?php if (!empty($comptes)): ?>
+                            <?php foreach ($comptes as $compte): ?>
+                                <option value="<?= htmlspecialchars($compte['numerotel']) ?>"
+                                    data-solde="<?= htmlspecialchars($compte['solde']) ?>"
+                                    data-type="<?= htmlspecialchars($compte['typecompte']) ?>"
+                                    data-numero="<?= htmlspecialchars($compte['numero']) ?>"
+                                    data-id="<?= htmlspecialchars($compte['id']) ?>">
+                                    <?= htmlspecialchars($compte['numero']) ?>
+                                    (<?= ucfirst(htmlspecialchars($compte['typecompte'])) ?>) -
+                                    <?= number_format($compte['solde'], 0, ',', ' ') ?> FCFA
+                                </option> <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+
+                    <?php if (empty($comptes)): ?>
+                        <p class="text-sm text-gray-600 mt-1">Utilisation du compte principal par défaut</p>
+                    <?php endif; ?>
+                </div>
+
                 <div>
                     <label for="montant" class="block text-sm font-semibold text-gray-700 mb-2">
                         Montant à déposer
@@ -69,22 +98,8 @@ $success = $session->get('success');
                     </div>
                 </div>
 
-                <!-- Message d'information -->
-                <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                    <div class="flex items-start">
-                        <svg class="w-5 h-5 text-orange-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor"
-                            viewBox="0 0 24 24">
-                            <path
-                                d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,7H13V9H11V7M11,11H13V17H11V11Z" />
-                        </svg>
-                        <div class="text-sm text-orange-700">
-                            <p class="font-medium mb-1">Information importante</p>
-                            <p>Le montant sera ajouté immédiatement à votre solde après validation.</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- Type de transaction -->
                 <div>
-
                     <label for="typetransaction" class="block text-sm font-semibold text-gray-700 mb-2">
                         Type de transaction
                     </label>
@@ -95,8 +110,39 @@ $success = $session->get('success');
                         <option value="retrait">Retrait</option>
                         <option value="paiement">Paiement</option>
                     </select>
-
                 </div>
+
+                <!-- Informations sur les frais -->
+                <div id="frais-info" class="bg-orange-50 p-4 rounded-lg border border-orange-200"
+                    style="display: none;">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-orange-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,7H13V9H11V7M11,11H13V17H11V11Z" />
+                        </svg>
+                        <div class="text-sm text-orange-700">
+                            <p class="font-medium mb-1">Information sur les frais</p>
+                            <p id="frais-details"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message d'information général -->
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,7H13V9H11V7M11,11H13V17H11V11Z" />
+                        </svg>
+                        <div class="text-sm text-blue-700">
+                            <p class="font-medium mb-1">Information importante</p>
+                            <p>Le montant sera ajouté immédiatement à votre solde après validation.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Boutons d'action -->
                 <div class="flex gap-3 pt-4">
                     <a href="/dashboard"
@@ -115,6 +161,61 @@ $success = $session->get('success');
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const compteSelect = document.getElementById('compte_source');
+        const typeSelect = document.getElementById('typetransaction');
+        const montantInput = document.getElementById('montant');
+        const fraisInfo = document.getElementById('frais-info');
+        const fraisDetails = document.getElementById('frais-details');
+
+        function calculerFrais() {
+            const compteOption = compteSelect.selectedOptions[0];
+            const type = typeSelect.value;
+            const montant = parseFloat(montantInput.value) || 0;
+
+            if (!compteOption || !type || !montant) {
+                fraisInfo.style.display = 'none';
+                return;
+            }
+
+            const typeCompte = compteOption.dataset.type;
+            const solde = parseFloat(compteOption.dataset.solde) || 0;
+            let frais = 0;
+            let message = '';
+
+            if (type === 'depot') {
+                if (typeCompte === 'principal') {
+                    frais = montant * 0.0085;
+                    message = `Frais de dépôt depuis compte principal: ${frais.toFixed(0)} FCFA (0,85%)`;
+                } else {
+                    message = 'Pas de frais pour un dépôt depuis un compte secondaire';
+                }
+            } else if (type === 'depot_principal_to_principal') {
+                frais = Math.min(montant * 0.08, 5000);
+                message = `Frais de transfert: ${frais.toFixed(0)} FCFA (max 5000 FCFA)`;
+            }
+
+            const total = montant + frais;
+            if (total > solde) {
+                message += ` - ⚠️ Solde insuffisant (besoin: ${total.toFixed(0)} FCFA, disponible: ${solde.toFixed(0)} FCFA)`;
+                fraisInfo.className = fraisInfo.className.replace('bg-orange-50 border-orange-200', 'bg-red-50 border-red-200');
+                fraisDetails.className = fraisDetails.className.replace('text-orange-700', 'text-red-700');
+            } else {
+                fraisInfo.className = fraisInfo.className.replace('bg-red-50 border-red-200', 'bg-orange-50 border-orange-200');
+                fraisDetails.className = fraisDetails.className.replace('text-red-700', 'text-orange-700');
+            }
+
+            fraisDetails.textContent = message;
+            fraisInfo.style.display = 'block';
+        }
+
+        compteSelect.addEventListener('change', calculerFrais);
+        typeSelect.addEventListener('change', calculerFrais);
+        montantInput.addEventListener('input', calculerFrais);
+    });
+</script>
 
 <style>
     /* Empêcher le scroll du body */
@@ -162,7 +263,8 @@ $success = $session->get('success');
     }
 
     /* Style focus personnalisé pour les inputs */
-    input:focus {
+    input:focus,
+    select:focus {
         box-shadow: 0 0 0 3px rgba(215, 86, 11, 0.1);
     }
 

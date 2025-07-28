@@ -16,7 +16,8 @@ $success = $session->get('success'); ?>
 <body class="flex h-screen bg-gray-100 font-sans overflow-hidden">
     <aside class="w-48 bg-[#D7560B] text-white flex flex-col h-full">
         <div class="text-white-700 items-center">
-            <p><span class="font-semibold">👤Numéro▼: </span> <?= htmlspecialchars($compte['numerotel']) ?></p>
+            <!-- <p><span class="font-semibold">👤Numéro▼: </span> <?= htmlspecialchars($compte['numerotel']) ?></p> -->
+            <img src="/images/uploads/om.png  " alt="logo" class="w-20 h-20 mx-auto mt-4">
         </div>
 
 
@@ -34,11 +35,13 @@ $success = $session->get('success'); ?>
                     <i class="fa-solid fa-user text-xl"></i> Mes Comptes
                 </button>
             </a>
-            <button
-                class="w-full flex items-center justify-start gap-3 bg-white text-black px-3 py-2 rounded font-semibold shadow border-l-2"
-                style="border-left-color: #D7560B">
-                <i class="fa-solid fa-money-bill-transfer text-xl"></i> Paiements
-            </button>
+            <a href="/woyofal/acheter">
+                <button
+                    class="w-full flex items-center justify-start gap-3 bg-white text-black px-3 py-2 rounded font-semibold shadow border-l-2"
+                    style="border-left-color: #D7560B">
+                    <i class="fa-solid fa-money-bill-transfer text-xl"></i> Achats woyofal
+                </button>
+            </a>
             <button
                 class="w-full flex items-center justify-start gap-3 bg-white text-black px-3 py-2 rounded font-semibold shadow border-l-2"
                 style="border-left-color: #D7560B">
@@ -66,12 +69,14 @@ $success = $session->get('success'); ?>
                 <span class="font-medium text-gray-800">
                     <?php
                     $user = $this->session->get('user');
+
                     if ($user && isset($user['nom']) && isset($user['prenom'])) {
                         echo htmlspecialchars($user['prenom'] . ' ' . $user['nom']);
                     } else {
                         echo 'Client';
                     }
                     ?>
+                    <?= htmlspecialchars($compte['numerotel']) ?></p>
                 </span>
                 <span class="text-lg">👤</span>
             </div>
@@ -214,6 +219,9 @@ $success = $session->get('success'); ?>
     </main>
 
 
+
+
+    
 
 </body>
 

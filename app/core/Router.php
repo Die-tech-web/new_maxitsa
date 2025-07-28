@@ -9,26 +9,30 @@ class Router
 {
     public static function resolve(array $routes)
     {
-
         $uri = $_SERVER['REQUEST_URI'];
 
         if (array_key_exists($uri, $routes)) {
-           
+            
+            // ✅ CORRECTION: Utiliser $routes[$uri] au lieu de $route
+            $route = $routes[$uri];
+            
+            // Vérifier et exécuter le middleware si nécessaire
             if (isset($route['middleware'])) {
                 $middlewares = Middlewares::getMiddlewares();
-                if (isset($middlewares[$routes['middleware']])) {
-                    $middlewares[$routes['middleware']]();
+                if (isset($middlewares[$route['middleware']])) {
+                    $middlewares[$route['middleware']]();
                 }
             }
-        $controllerName = $routes[$uri]['controller'];
-        $methode = $routes[$uri]['methode'];
-        $controller = new $controllerName();
-        $controller->$methode();
-
+            
+            // ✅ CORRECTION: Utiliser $route au lieu de $routes[$uri]
+            $controllerName = $route['controller'];
+            $methode = $route['methode'];
+            
+            $controller = new $controllerName();
+            $controller->$methode();
 
         } else {
-            echo "404";
+            echo "404 - Page non trouvée";
         }
-
     }
 }
