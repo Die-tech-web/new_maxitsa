@@ -3,11 +3,14 @@ namespace App\Controller;
 
 use App\Core\Abstract\AbstractController;
 use App\Core\App;
+use App\Repository\CompteRepository;
 use App\Service\TransactionService;
 
 class TransactionController extends AbstractController
 {
     private TransactionService $transactionService;
+    private CompteRepository $compteRepository; 
+
 
     public function __construct()
     {
@@ -140,7 +143,7 @@ class TransactionController extends AbstractController
             // NOUVELLE LOGIQUE AVEC SÉLECTION DE COMPTE
             $compteService = App::getDependency('compteService');
             $compteSource = null;
-            
+
             // Récupérer tous les comptes pour trouver celui sélectionné par numéro de téléphone
             $tousLesComptes = $compteService->getAllComptesByUserId($user['id']);
             foreach ($tousLesComptes as $compte) {
@@ -196,12 +199,12 @@ class TransactionController extends AbstractController
             if ($typetransaction === 'depot') {
                 // Pour un dépôt, on AJOUTE le montant au solde du compte sélectionné
                 $compteSource['solde'] = $compteSource['solde'] + $montant;
-                
+
                 // Si c'est un compte secondaire, débiter le compte principal
                 if ($compteSource['typecompte'] === 'secondaire') {
                     $compteRepo = App::getDependency('compteRepository');
                     $comptePrincipal = $compteRepo->getComptePrincipal($user['id']);
-                    
+
                     if ($comptePrincipal) {
                         // Vérifier si le compte principal a assez de fonds
                         if ($comptePrincipal['solde'] < $montant) {
@@ -209,7 +212,7 @@ class TransactionController extends AbstractController
                             header('Location: /depot');
                             exit;
                         }
-                        
+
                         // Débiter le compte principal
                         $nouveauSoldePrincipal = $comptePrincipal['solde'] - $montant;
                         $compteRepo->updateSolde($comptePrincipal['id'], $nouveauSoldePrincipal);
@@ -281,9 +284,19 @@ class TransactionController extends AbstractController
     }
 
     // Méthodes placeholders si tu veux les compléter plus tard
-    public function destroy(): void {}
-    public function show($id): void {}
-    public function edit(): void {}
-    public function update(): void {}
-    public function delete(): void {}
+    public function destroy(): void
+    {
+    }
+    public function show($id): void
+    {
+    }
+    public function edit(): void
+    {
+    }
+    public function update(): void
+    {
+    }
+    public function delete(): void
+    {
+    }
 }
