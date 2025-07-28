@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  php:
+    build: .
+    ports:
+      - "8040:8000"  # Port externe accessible depuis l'extérieur
+    environment:
+      DB_DRIVER: pgsql
+      DB_HOST: interchange.proxy.rlwy.net
+      DB_PORT: 13105
+      DB_NAME: railway
+      DB_USERNAME: postgres
+      DB_PASSWORD: OoORyLfeBWbCwCzFZrjsExwYZvoXUmeo
+      DSN: "pgsql:host=interchange.proxy.rlwy.net;dbname=railway;port=13105"
+    working_dir: /app
+    command: php -S 0.0.0.0:8000 -t public

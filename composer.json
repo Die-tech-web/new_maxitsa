@@ -28,3 +28,5 @@
     "database:seeder": "php seeders/seeder.php"
   }
 }
+
+
