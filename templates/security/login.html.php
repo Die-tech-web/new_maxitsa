@@ -87,7 +87,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div class="credential-item p-4 rounded-lg">
-            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Login Professeur</label>
+            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Login</label>
             <div class="flex items-center justify-between">
                 <code class="text-sm font-mono text-gray-800 bg-white px-2 py-1 rounded border flex-1 mr-2" id="test-login">die_6887cc818cf3e</code>
                 <button type="button" onclick="copyToField('test-login', 'login')" 
