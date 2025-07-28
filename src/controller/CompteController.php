@@ -8,6 +8,7 @@ use App\Service\CompteService;
 use Dotenv\Validator;
 class CompteController extends AbstractController
 {
+    private CompteService $compteService;
 
     public function __construct()
     {
@@ -37,7 +38,7 @@ class CompteController extends AbstractController
 
     public function listeComptes()
     {
-        
+
         $user = $this->session->get('user');
         $compteService = App::getDependency('compteService');
         $compte = $compteService->getSolde($user['id']);
@@ -90,21 +91,21 @@ class CompteController extends AbstractController
         $this->renderHtml('compte/list', ['comptes' => $comptes]);
     }
 
-  public function changerComptePrincipal()
-{
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $user = $this->session->get('user');
-        $userId = $user['id'];
-        $compteSecondaireId = $_POST['compte_id'] ?? null;
+    public function changerComptePrincipal()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $user = $this->session->get('user');
+            $userId = $user['id'];
+            $compteSecondaireId = $_POST['compte_id'] ?? null;
 
-        if ($compteSecondaireId) {
-            $this->compteService->basculerEnprincipal($userId, (int) $compteSecondaireId);
-            $this->session->set('success', 'Le compte secondaire est maintenant principal.');
+            if ($compteSecondaireId) {
+                $this->compteService->basculerEnprincipal($userId, (int) $compteSecondaireId);
+                $this->session->set('success', 'Le compte secondaire est maintenant principal.');
+            }
+            header('Location: /compte/list');
+            exit;
         }
-        header('Location: /compte/list');
-        exit;
     }
-}
 
 
 
